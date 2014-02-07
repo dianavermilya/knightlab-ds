@@ -1,8 +1,11 @@
 def dataToDict(f):
 	d = {}
 	f = open(f, 'r')
-	keyString = f.readline()[:-2]
+	
+	# strip line ending characters and split on commas
+	keyString = f.readline().relpace('\n','').replace('\r','')
 	keys = keyString.split(",")
+	
 	for key in keys:
 		d[key] = []
 	for line in f:
