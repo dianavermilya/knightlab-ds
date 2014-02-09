@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import numpy
 import urllib
 
@@ -38,25 +37,25 @@ def meanAge(d):
     return float(s)/len(ages)
 
 def AgePmf(d):
-    print d['age'], type(d['age'])
-    pmf = thinkstats2.MakePmfFromList(d['age'], 'age')
-    print "got here"
-
+    ages = [float(age) for age in d['age']]
+    pmf = thinkstats2.MakePmfFromList(ages, 'age')
     thinkplot.Hist(pmf)
     thinkplot.Show(title='PMF of Age',
-               xlabel='age(years',
+               xlabel='age(years)',
                ylabel='probability')
 
 
+def AgeCdf(d):
+    ages = [float(age) for age in d['age']]
+    cdf = thinkstats2.MakeCdfFromList(ages, 'age')
 
+    thinkplot.Cdf(cdf)
+    thinkplot.Show(title='CDF of Age',
+               xlabel='age(years)',
+               ylabel='probability')
 
 
 beths = dataToDict('beths.csv')
 taxo = dataToDict('taxo.csv')
-<<<<<<< HEAD
-AgePmf(beths)
-=======
-print 
-print meanAge(beths)
-print meanAge(taxo)
->>>>>>> f09ff3b38c35c44841a78f6f251fb080a1e83b4e
+AgeCdf(beths)
+AgeCdf(taxo)
