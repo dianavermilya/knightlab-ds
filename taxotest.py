@@ -5,10 +5,35 @@ import thinkplot
 import thinkstats2
 
 import codecs
+import datetime
 
-def dataToDict(f):
+def reviseDataType (string):
+	try:
+		return int(string)
+	except:
+		pass
+	try:
+		return float(string)
+	except:
+		pass
+	if string.strip() == "":
+		return None
+	if len(string.split("/")) == 3:
+		[day, month, year] = string.split("/")
+		try:
+			return datetime.date(int(year), int(month), int(day))
+		except:
+			pass
+
+	return string
+
+
+
+def dataToDict(filename):
 	d = {}
-	f = open(f, 'r')
+	f = open(filename, 'r')
+	wr = open("strings" + filename, "w")
+	count = 0
 	
 	# strip line ending characters
 	keyString = f.readline().rstrip()
@@ -24,21 +49,28 @@ def dataToDict(f):
 	for line in f:
 		ans=line.split(",")
 		for i in range(len(keys)):
-			d[keys[i]].append(ans[i])
+			val = reviseDataType(ans[i])
+			if isinstance(val, str):
+				count += 1
+				wr.write(val + "\n--\n")
+			d[keys[i]].append(val)
+	print "count: ", count
 	
 	return d
 
 
-def meanAge(d):
-    ages = d['age']
+def mean(d, key):
+    vals = d[key]
     s = 0
-    for age in ages:
-        s += int(age)
-    return float(s)/len(ages)
+    try:
+	    for val in vals:
+	        s += int(val)
+	    return float(s)/len(val)
+	except:
+		"One of your values is not a number."
 
 def AgePmf(d):
-    ages = [float(age) for age in d['age']]
-    pmf = thinkstats2.MakePmfFromList(ages, 'age')
+    pmf = thinkstats2.MakePmfFromList(d['age'], 'age')
     thinkplot.Hist(pmf)
     thinkplot.Show(title='PMF of Age',
                xlabel='age(years)',
@@ -57,5 +89,5 @@ def AgeCdf(d):
 
 beths = dataToDict('beths.csv')
 taxo = dataToDict('taxo.csv')
-AgeCdf(beths)
-AgeCdf(taxo)
+#AgeCdf(beths)
+#AgeCdf(taxo)
