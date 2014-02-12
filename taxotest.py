@@ -30,8 +30,13 @@ def reviseDataType (string):
 
 
 def dataToDict(filename):
-    d = {}
-    tagToDataType = {}
+    """
+        Turns a csv databse into a dictionarry.
+        
+        Assumes: "__nonnumeric__" is not a column heading
+    """
+    nonnumeric_key = "__nonnumeric__"
+    d = {nonnumeric_key: {}}
     f = open(filename, 'r')
     wr = open("strings" + filename, "w")
     count = 0
@@ -51,6 +56,10 @@ def dataToDict(filename):
         ans=line.split(",")
         for i in range(len(keys)):
             val = reviseDataType(ans[i])
+            if not(isinstance(val,(int, long, float, complex, type(None)))):
+                # mark data in this column as nonnumeric
+                d[nonnumeric_key][keys[i]] = True
+             
             if isinstance(val, str):
                 count += 1
                 wr.write(val + "\n--\n")
@@ -129,7 +138,7 @@ taxo = dataToDict('taxo.csv')
 
 Scatter(taxo, 'ComsxFac', 'anxwom')
 Scatter(taxo, 'Voyeur', 'PCD')
-Scatter(taxo, 'lkemp', 'Pnvio')
+Scatter(taxo, 'lkemp', 'JuvDrgFc')
 
 #AgeCdf(beths)
 #AgeCdf(taxo)
