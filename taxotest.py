@@ -96,7 +96,7 @@ def AgeCdf(d):
                xlabel='age(years)',
                ylabel='probability')
 
-def Scatter(d, var1, var2):
+def Scatter(d, var1, var2, **kwargs):
     """Assuming numerical for now (will call isNumerical()"""
     xs = list(d[var1])
     ys = list(d[var2])
@@ -104,7 +104,7 @@ def Scatter(d, var1, var2):
     
     print 'Spearman corr', thinkstats2.SpearmanCorr(xs, ys)
     
-    thinkplot.Scatter(xs, ys)
+    thinkplot.Scatter(xs, ys, **kwargs)
     thinkplot.show()
 
 def RemoveNone(*args):
@@ -170,7 +170,7 @@ def KeyCorrolation(d, key1, key2):
     return thinkstats2.SpearmanCorr(l1,l2)
   
 
-beths = dataToDict('beths.csv')
+#beths = dataToDict('beths.csv')
 taxo = dataToDict('taxo.csv')
 
 # test on a small sample
@@ -186,12 +186,12 @@ all_corrs = AllSpearmanCorr(small_taxo)
 all_corrs.sort(reverse=True)
 print all_corrs[:20]
 
-Scatter(taxo, 'ComsxFac', 'anxwom')
-Scatter(taxo, 'Voyeur', 'PCD')
-Scatter(taxo, 'lkemp', 'JuvDrgFc')
-Scatter(taxo, 'JuvaslFc', 'JuvDrgFc')
-Scatter(taxo, 'sxdeny','SxPrFAC')
-Scatter(taxo, 'asltcomc', 'Pnchldjv')
+Scatter(taxo, 'sxdeny','SxPrFAC', label="sxdeny vs SxPrFAC", title = str(KeyCorrolation(taxo, 'sxdeny', 'SxPrFAC')))
+Scatter(taxo, 'ComsxFac', 'anxwom', label="ComsxFac vs anxwom")
+Scatter(taxo, 'Voyeur', 'PCD', label="Voyer vs PCD")
+Scatter(taxo, 'lkemp', 'JuvDrgFc', label="lkemp vs JuvDrgFc")
+Scatter(taxo, 'JuvaslFc', 'JuvDrgFc', label="JuvaslFc vs JuvDrgFc")
+Scatter(taxo, 'asltcomc', 'Pnchldjv', label="asltcomc vs Pnchldjv")
 #AgeCdf(beths)
 #AgeCdf(taxo)
 
