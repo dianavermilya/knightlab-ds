@@ -89,15 +89,51 @@ def AgeCdf(d):
 
 def Scatter(d, var1, var2):
     """Assuming numerical for now (will call isNumerical()"""
-    xs = d[var1]
-    ys = d[var2]
+    xs = list(d[var1])
+    ys = list(d[var2])
+    RemoveNone(xs,ys)
+    
+    print 'Spearman corr', thinkstats2.SpearmanCorr(xs, ys)
+    
     thinkplot.Scatter(xs, ys)
     thinkplot.show()
+
+def RemoveNone(*args):
+    """Given an arbitrary number of lists, removes the ith entry from
+       all of them if any of them is None at that point.
+       
+       Assumes: all lists are the same dimension"""
+    
+    # we start out with all elements
+    length = len(args[0])
+    
+    # this is probably the ugliest code I have ever written :(
+    index = 0
+    while index < length:
+        old_length = length
+        for array in args:
+            if array[index] is None:
+                # pop each list
+                for array in args:
+                    array.pop(index)
+                
+                length -= 1
+                break
+        
+        # only increment index if we didn't remove any items
+        if old_length == length:
+            index += 1
 
 beths = dataToDict('beths.csv')
 taxo = dataToDict('taxo.csv')
 
 Scatter(taxo, 'ComsxFac', 'anxwom')
+Scatter(taxo, 'Voyeur', 'PCD')
+Scatter(taxo, 'lkemp', 'Pnvio')
 
 #AgeCdf(beths)
 #AgeCdf(taxo)
+
+#l1 = [1,2,3,4,None]
+#l2 = [1,2,3,4,5]
+#RemoveNone(l1,l2)
