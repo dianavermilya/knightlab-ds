@@ -1,6 +1,6 @@
 import numpy
 import urllib
-
+import math
 import thinkplot
 import thinkstats2
 
@@ -33,10 +33,10 @@ def dataToDict(filename):
     """
         Turns a csv databse into a dictionarry.
         
-        Assumes: "__nonnumeric__" is not a column heading
+        Assumes: "__numeric__" is not a column heading
     """
-    nonnumeric_key = "__nonnumeric__"
-    d = {nonnumeric_key: {}}
+    numeric_key = "__numeric__"
+    d = {numeric_key: {}}
     f = open(filename, 'r')
     wr = open("strings" + filename, "w")
     count = 0
@@ -56,9 +56,9 @@ def dataToDict(filename):
         ans=line.split(",")
         for i in range(len(keys)):
             val = reviseDataType(ans[i])
-            if not(isinstance(val,(int, long, float, complex, type(None)))):
-                # mark data in this column as nonnumeric
-                d[nonnumeric_key][keys[i]] = True
+            if (isinstance(val,(int, long, float, complex, type(None)))):
+                # mark data in this column as numeric
+                d[numeric_key][keys[i]] = True
              
             if isinstance(val, str):
                 count += 1
@@ -133,13 +133,65 @@ def RemoveNone(*args):
         if old_length == length:
             index += 1
 
+def ChooseTwo(l):
+    """
+    Given a list, retruns a list of all possible tuples of the elements
+    (considering order as irrelevant)
+    """
+    
+    return [(a, b) for a in l for b in l[l.index(a)+1:]]
+
+
+def AllSpearmanCorr(d):
+    """
+    Calculates the absolute value of the Spearman corrolation for all pairs of
+    numeric columns in the data dictionary
+    """
+    
+    numeric_keys = [key for key in d.keys() if key in d["__numeric__"]]
+    
+    key_pairs = ChooseTwo(numeric_keys)
+    return [(abs(KeyCorrolation(d,*pair)),) + pair for pair in key_pairs]
+
+def KeyCorrolation(d, key1, key2):
+    """
+    Given a dictionary, and two keys, returns a corrolation constant.
+    Assumes: keys are valid and lead to equal-length numeric lists
+    """
+    
+    l1 = list(d[key1])
+    l2 = list(d[key2])
+    RemoveNone(l1,l2)
+    
+    #if there is nothing left, return a corrolation of zero
+    if len(l1)==0 or len(l2)==0:
+        return 0
+
+    return thinkstats2.SpearmanCorr(l1,l2)
+  
+
 beths = dataToDict('beths.csv')
 taxo = dataToDict('taxo.csv')
+
+# test on a small sample
+import re
+_digits = re.compile('\d')
+def contains_digits(d):
+    return bool(_digits.search(d))
+
+# I chose to arbitrarily filter out data with digits, because they semmed less useful.
+small_taxo = {key:taxo[key] for key in taxo.keys()[:30] if not(contains_digits(key))}
+small_taxo.update({"__numeric__": taxo["__numeric__"]})
+all_corrs = AllSpearmanCorr(small_taxo)
+all_corrs.sort(reverse=True)
+print all_corrs[:20]
 
 Scatter(taxo, 'ComsxFac', 'anxwom')
 Scatter(taxo, 'Voyeur', 'PCD')
 Scatter(taxo, 'lkemp', 'JuvDrgFc')
-
+Scatter(taxo, 'JuvaslFc', 'JuvDrgFc')
+Scatter(taxo, 'sxdeny','SxPrFAC')
+Scatter(taxo, 'asltcomc', 'Pnchldjv')
 #AgeCdf(beths)
 #AgeCdf(taxo)
 
