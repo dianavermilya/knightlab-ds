@@ -124,11 +124,9 @@ def RemoveNone(*args):
             if array[index] is None:
                 # pop each list
                 for array in args:
-                    array.pop(index)
-                
+                    array.pop(index)       
                 length -= 1
                 break
-        
         # only increment index if we didn't remove any items
         if old_length == length:
             index += 1
@@ -164,7 +162,7 @@ def KeyCorrolation(d, key1, key2):
     RemoveNone(l1,l2)
     
     #if there is nothing left, return a corrolation of zero
-    if len(l1)==0 or len(l2)==0:
+    if len(l1)<=1 or len(l2)<=1:
         return 0
 
     return thinkstats2.SpearmanCorr(l1,l2)
@@ -180,13 +178,15 @@ def contains_digits(d):
     return bool(_digits.search(d))
 
 # I chose to arbitrarily filter out data with digits, because they semmed less useful.
-small_taxo = {key:taxo[key] for key in taxo.keys()[:30] if not(contains_digits(key))}
+small_taxo = {key:taxo[key] for key in taxo.keys()[:] if not(contains_digits(key))}
 small_taxo.update({"__numeric__": taxo["__numeric__"]})
+import pdb; pdb.set_trace()
 all_corrs = AllSpearmanCorr(small_taxo)
 all_corrs.sort(reverse=True)
 print all_corrs[:20]
 
-Scatter(taxo, 'sxdeny','SxPrFAC', label="sxdeny vs SxPrFAC", title = str(KeyCorrolation(taxo, 'sxdeny', 'SxPrFAC')))
+Scatter(taxo, 'sxdeny','SxPrFAC', label="sxdeny vs SxPrFAC")
+Scatter(taxo, 'ExAggbeh', 'JuvDelBehSexual')
 Scatter(taxo, 'ComsxFac', 'anxwom', label="ComsxFac vs anxwom")
 Scatter(taxo, 'Voyeur', 'PCD', label="Voyer vs PCD")
 Scatter(taxo, 'lkemp', 'JuvDrgFc', label="lkemp vs JuvDrgFc")
