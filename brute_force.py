@@ -2,31 +2,7 @@ import math
 import thinkplot
 import thinkstats2
 import numpy
-from filter_data import dataToDict
-
-def RemoveNone(*args):
-    """Given an arbitrary number of lists, removes the ith entry from
-       all of them if any of them is None at that point.
-       
-       Assumes: all lists are the same dimension"""
-    
-    # we start out with all elements
-    length = len(args[0])
-    
-    # this is probably the ugliest code I have ever written :(
-    index = 0
-    while index < length:
-        old_length = length
-        for array in args:
-            if array[index] is None:
-                # pop each list
-                for array in args:
-                    array.pop(index)       
-                length -= 1
-                break
-        # only increment index if we didn't remove any items
-        if old_length == length:
-            index += 1
+from filter_data import dataToDict, remove_none
 
 def ChooseTwo(l):
     """
@@ -44,7 +20,7 @@ def KeyCorrolation(d, key1, key2):
     
     l1 = list(d[key1])
     l2 = list(d[key2])
-    RemoveNone(l1,l2)
+    remove_none([l1,l2])
     
     #if there is nothing left, return a corrolation of zero
     if len(l1)<=1 or len(l2)<=1:
@@ -73,7 +49,7 @@ def KeyInterestingness(d, key1, key2):
     """
     l1 = list(d[key1])
     l2 = list(d[key2])
-    RemoveNone(l1,l2)
+    remove_none([l1,l2])
     
     #if there is nothing left, return a interestingness of zero
     if len(l1)<=1 or len(l2)<=1:
@@ -81,13 +57,14 @@ def KeyInterestingness(d, key1, key2):
     
     # we don't care which is the independant or depandant variable
     # except for some reason, using l1 seems to work better
-    return Interest(l1,l2)
+    return min(Interest(l1,l2), Interest(l2,l1))
 
 def Interest(l1, l2):
     """
     Tries to say how interesting the relation between these two lists
     of numbers is
     """
+    
     points = zip(l1,l2)
     l1min = min(l1)
     l1max = max(l1)
@@ -98,7 +75,7 @@ def Interest(l1, l2):
         return 0
 
     # arbitrarily bin it into 10 bins
-    num_bins = 10
+    num_bins = 20
     width = (max(l1) - min(l1))/float(num_bins)
     
     # now, we bin the l2 points based on the l1 values they
@@ -114,13 +91,12 @@ def Interest(l1, l2):
     # we define the interestingness of a bin to be the squared difference
     # of the median in the bin to the median of all l2 values, times the
     # number of items in the bin   
-    l2median = numpy.median(l2)
-
+    l2median = numpy.mean(l2)
     interest_value = 0
     for pbin in point_bins:
         if len(pbin)>0:
-            diff = numpy.median(pbin) - l2median
-            interest_value += math.sqrt(diff**2*math.log(len(pbin)))/l2var
+            diff = numpy.mean(pbin) - l2median
+            interest_value += math.sqrt(diff**2*math.log(len(pbin)))/math.sqrt(l2var)
     
     return interest_value
 
@@ -128,7 +104,7 @@ def Scatter(d, var1, var2, **kwargs):
 
     xs = list(d[var1])
     ys = list(d[var2])
-    RemoveNone(xs,ys)
+    remove_none([xs,ys])
     
     print 'Spearman corr', thinkstats2.SpearmanCorr(xs, ys), 'for ' + var1 + ' vs ' + var2
     
@@ -151,8 +127,8 @@ if __name__ == '__main__':
 
     all_corrs = AllSpearmanCorr(taxo, filt = no_digits, comp = KeyInterestingness)
     all_corrs.sort(reverse=True)
-    print all_corrs[:40]
-    for c in all_corrs[:40]:
+    print all_corrs[:9]
+    for c in all_corrs[:9]:
         Scatter(taxo, c[1], c[2], label = c[1] + " vs " + c[2])
         
     #Scatter(taxo, 'sxdeny','SxPrFAC', label="sxdeny vs SxPrFAC")

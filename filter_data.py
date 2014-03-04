@@ -84,7 +84,31 @@ def mean(d, key):
     except:
         "One of your values is not a number."
 
-  
+def remove_none(listOfLists):
+    """Given an arbitrary number of lists, removes the ith entry from
+       all of them if any of them is None at that point.
+       
+       Assumes: all lists are the same dimension"""
+    
+    # we start out with all elements
+    length = len(listOfLists[0])
+    
+    # this is probably the ugliest code I have ever written :(
+    index = 0
+    while index < length:
+        old_length = length
+        for array in listOfLists:
+            if array[index] is None:
+                # pop each list
+                for array in listOfLists:
+                    array.pop(index)       
+                length -= 1
+                break
+
+        # only increment index if we didn't remove any items
+        if old_length == length:
+            index += 1
+
 if __name__ == '__main__':
     #beths = dataToDict('beths.csv')
     taxo = dataToDict('taxo.csv')
