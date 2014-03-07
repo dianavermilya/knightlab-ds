@@ -12,57 +12,48 @@ def ChooseTwo(l):
     
     return [(a, b) for a in l for b in l[l.index(a)+1:]]
 
-def KeyCorrolation(d, key1, key2):
+def KeyCompare(d, key1, key2, comp = thinkstats2.Corr):
     """
-    Given a dictionary, and two keys, returns a corrolation constant.
+    Given a dictionary, and two keys, returns a comparison constant.
     Assumes: keys are valid and lead to equal-length numeric lists
     """
     
     l1 = list(d[key1])
     l2 = list(d[key2])
-    remove_none([l1,l2])
+    l = remove_none([l1,l2])
     
     #if there is nothing left, return a corrolation of zero
-    if len(l1)<=1 or len(l2)<=1:
+    if len(l[0])<=1 or len(l[1])<=1:
         return 0
     
-    corr = thinkstats2.SpearmanCorr(l1,l2)
+    corr = comp(l[0], l[1])
     if math.isnan(corr):
         corr = 0
 
-    return corr*len(l1)
+    return corr
 
-def AllSpearmanCorr(d, filt = lambda(x): True, comp = KeyCorrolation):
+def AllPairs(d, comp = thinkstats2.Corr):
     """
-    Calculates the absolute value of the Spearman corrolation for all pairs of
+    Calculates the absolute value of the comparison function for all pairs of
     numeric columns in the data dictionary whose keys satisfy the filter function
     """
     
-    numeric_keys = [key for key in d["__numeric__"] if filt(key)]
+    numeric_keys = [key for key in d["__numeric__"] if key in d["__relevant__"]]
     key_pairs = ChooseTwo(numeric_keys)
-    return [(abs(comp(d,*pair)),) + pair for pair in key_pairs]
+    return [(abs(KeyCompare(d,*pair, comp = comp)),) + pair for pair in key_pairs]
 
-def KeyInterestingness(d, key1, key2):
+def Interestingness(l1, l2):
     """
-    Given a dictionary, and two keys, returns an interestingness value.
-    Assumes: keys are valid and lead to equal-length numeric lists
+    Given a dictionary, and two keys, returns an interestingness value, based on assuming alternately that l2 depends on l1 and vice versa.
     """
-    l1 = list(d[key1])
-    l2 = list(d[key2])
-    remove_none([l1,l2])
-    
-    #if there is nothing left, return a interestingness of zero
-    if len(l1)<=1 or len(l2)<=1:
-        return 0
     
     # we don't care which is the independant or depandant variable
     # except for some reason, using l1 seems to work better
-    return min(Interest(l1,l2), Interest(l2,l1))
+    return max(Interest(l1,l2), Interest(l2,l1))
 
 def Interest(l1, l2):
     """
-    Tries to say how interesting the relation between these two lists
-    of numbers is
+    Tries to say how interesting l1 is as a predictor of l2.
     """
     
     points = zip(l1,l2)
@@ -91,52 +82,36 @@ def Interest(l1, l2):
     # we define the interestingness of a bin to be the squared difference
     # of the median in the bin to the median of all l2 values, times the
     # number of items in the bin   
-    l2median = numpy.mean(l2)
+    l2median = numpy.median(l2)
     interest_value = 0
     for pbin in point_bins:
         if len(pbin)>0:
-            diff = numpy.mean(pbin) - l2median
-            interest_value += math.sqrt(diff**2*math.log(len(pbin)))/math.sqrt(l2var)
+            diff = numpy.median(pbin) - l2median
+            interest_value += math.sqrt(diff**2*math.sqrt(len(pbin)))/math.sqrt(l2var)
     
     return interest_value
 
 def Scatter(d, var1, var2, **kwargs):
-
+    """scatter plots the various data, and prints info on it.
+    """
     xs = list(d[var1])
     ys = list(d[var2])
-    remove_none([xs,ys])
+    data = remove_none([xs,ys])
     
-    print 'Spearman corr', thinkstats2.SpearmanCorr(xs, ys), 'for ' + var1 + ' vs ' + var2
+    print 'Spearman corr', thinkstats2.SpearmanCorr(data[0], data[1]), 'for ' + var1 + ' vs ' + var2
     
-    print 'interest', KeyInterestingness(d, var1, var2), 'for ' + var1 + ' vs ' + var2
+    print 'interest', Interestingness(data[0],data[1]), 'for ' + var1 + ' vs ' + var2
     
-    thinkplot.Scatter(xs, ys, **kwargs)
+    thinkplot.Scatter(data[0], data[1], **kwargs)
     thinkplot.show()
 
 if __name__ == '__main__':
     #beths = dataToDict('beths.csv')
     taxo = dataToDict('taxo.csv')
 
-    # test on a small sample
-    import re
-    _digits = re.compile('\d')
-    def no_digits(d):
-        return not(bool(_digits.search(d)))
-
-    # I chose to arbitrarily filter out data with digits, because they semmed less useful.
-
-    all_corrs = AllSpearmanCorr(taxo, filt = no_digits, comp = KeyInterestingness)
+    all_corrs = AllPairs(taxo, comp = Interestingness)
     all_corrs.sort(reverse=True)
-    print all_corrs[:9]
-    for c in all_corrs[:9]:
+    print all_corrs[:19]
+    for c in all_corrs[:19]:
         Scatter(taxo, c[1], c[2], label = c[1] + " vs " + c[2])
-        
-    #Scatter(taxo, 'sxdeny','SxPrFAC', label="sxdeny vs SxPrFAC")
-    #Scatter(taxo, 'JuvaslFc', 'impschgr', label="sxdeny vs SxPrFAC")
-    #Scatter(taxo, 'ComsxFac', 'anxwom', label="ComsxFac vs anxwom")
-    #Scatter(taxo, 'Voyeur', 'PCD', label="Voyer vs PCD")
-    #Scatter(taxo, 'lkemp', 'JuvDrgFc', label="lkemp vs JuvDrgFc")
-    #Scatter(taxo, 'JuvaslFc', 'JuvDrgFc', label="JuvaslFc vs JuvDrgFc")
-    #Scatter(taxo, 'asltcomc', 'Pnchldjv', label="asltcomc vs Pnchldjv")
-    #AgeCdf(beths)
-    #AgeCdf(taxo)
+\

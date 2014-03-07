@@ -32,6 +32,10 @@ def reviseDataType (string):
     return string
 
 
+import re
+_digits = re.compile('\d')
+def no_digits(s):
+    return not(bool(_digits.search(s)))
 
 def dataToDict(filename):
     """
@@ -40,7 +44,8 @@ def dataToDict(filename):
         Assumes: "__numeric__" is not a column heading
     """
     numeric_key = "__numeric__"
-    d = {numeric_key: {}}
+    relevant_key = "__relevant__"
+    d = {numeric_key: [], relevant_key:[]}
     f = open(filename, 'r')
     #wr = open("strings" + filename, "w")
     count = 0
@@ -54,8 +59,11 @@ def dataToDict(filename):
       
     keys = keyString.split(",")
     
+    # assign all keys that don't contain digits as interesting
+    d[relevant_key] = [key for key in keys if no_digits(key)]
+    
     #start out by assuming everything is numeric
-    d[numeric_key] = {key:True for key in keys}
+    d[numeric_key] = list(keys)
     for line in f:
         ans=line.split(",")
         for i in range(len(keys)):
@@ -63,12 +71,9 @@ def dataToDict(filename):
             if not(isinstance(val,(int, long, float, complex, type(None)))):
                 # mark data in this column as containing non-numeric
                 if keys[i] in d[numeric_key]:
-                    d[numeric_key].pop(keys[i])
+                    d[numeric_key].remove(keys[i])
                     count += 1
-             
-            #if isinstance(val, str):
-            #    count += 1
-            #    wr.write(val + "\n--\n")
+            
             d.setdefault(keys[i], []).append(val)
     print "numeric columns: ", len(keys) - count
     
