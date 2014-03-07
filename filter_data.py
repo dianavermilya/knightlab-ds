@@ -5,6 +5,7 @@ import thinkplot
 import thinkstats2
 import codecs
 import datetime
+import warnings
 
 def reviseDataType (string):
     """
@@ -88,19 +89,28 @@ def remove_none(listOfLists):
     """Given an arbitrary number of lists, removes the ith entry from
        all of them if any of them is None at that point.
        
+       Does not modify original lists
+       
        Assumes: all lists are the same dimension"""
     
-    # we start out with all elements
-    length = len(listOfLists[0])
+    newLists = [list(data) for data in listOfLists]
+    
+    # we start iterating over the shortest list
+    length = min([len(el) for el in newLists])
+    
+    # check that they are all the same length, of not raise warning
+    for el in newLists:
+        if len(el) != length:
+            warnings.warn("Arrays not te same length!!")
     
     # this is probably the ugliest code I have ever written :(
     index = 0
     while index < length:
         old_length = length
-        for array in listOfLists:
+        for array in newLists:
             if array[index] is None:
                 # pop each list
-                for array in listOfLists:
+                for array in newLists:
                     array.pop(index)       
                 length -= 1
                 break
@@ -108,31 +118,46 @@ def remove_none(listOfLists):
         # only increment index if we didn't remove any items
         if old_length == length:
             index += 1
+     
+    return newLists
 
 if __name__ == '__main__':
-    #beths = dataToDict('beths.csv')
-    taxo = dataToDict('taxo.csv')
-
-    # test on a small sample
-    import re
-    _digits = re.compile('\d')
-    def contains_digits(d):
-        return bool(_digits.search(d))
-
-    # I chose to arbitrarily filter out data with digits, because they semmed less useful.
-    small_taxo = {key:taxo[key] for key in taxo.keys()[:] if not(contains_digits(key))}
-    small_taxo.update({"__numeric__": taxo["__numeric__"]})
-    all_corrs = AllSpearmanCorr(small_taxo)
-    all_corrs.sort(reverse=True)
-    print all_corrs[:20]
-
-    Scatter(taxo, 'sxdeny','SxPrFAC', label="sxdeny vs SxPrFAC")
-    Scatter(taxo, 'ExAggbeh', 'JuvDelBehSexual')
-    Scatter(taxo, 'ComsxFac', 'anxwom', label="ComsxFac vs anxwom")
-    Scatter(taxo, 'Voyeur', 'PCD', label="Voyer vs PCD")
-    Scatter(taxo, 'lkemp', 'JuvDrgFc', label="lkemp vs JuvDrgFc")
-    Scatter(taxo, 'JuvaslFc', 'JuvDrgFc', label="JuvaslFc vs JuvDrgFc")
-    Scatter(taxo, 'asltcomc', 'Pnchldjv', label="asltcomc vs Pnchldjv")
-    #AgeCdf(beths)
-    #AgeCdf(taxo)
+    l1 = [1,2,3,None]
+    l2 = [1,2,3,4]
+    l = remove_none([l1,l2])
+    assert l[0] == [1,2,3]
+    assert l[0] == l[1]
+    
+    l1 = [1,2,None,None,None]
+    l2 = [1,2,None,None,None]
+    l = remove_none([l1,l2])
+    assert l[0] == [1, 2]
+    assert l[1] == l[0]
+    
+    l1 = [1,2,3,4,None]
+    l2 = [1, 2,3,None,5]
+    l3 = [1,2,None,4,5]
+    l4 = [1,None,3,4,5]
+    l5 = [None,2,3,4,5]
+    
+    l = remove_none([l1,l2,l3,l4,l5])
+    assert l[0] == []
+    assert l[2] == l[1]
+    assert l[3] == l[2]
+    assert l[4] == l[3]
+    assert l[4] == l[0]
+    
+    l1 = [1,2,3,None]
+    l2 = l1
+    l = remove_none([l1,l2])
+    assert l[0] == l[1]
+    
+    with warnings.catch_warnings(record=True) as w:
+        l = remove_none([[1,None,3,4],[1,2,3]])
+        assert len(w) == 1
+        assert "Arrays not te same length!!" in w[0].message
+        
+        assert l[0] == [1,3,4]
+        assert l[1] == [1,3]
+    
 
