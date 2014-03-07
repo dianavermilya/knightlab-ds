@@ -18,12 +18,13 @@ from filter_data import *
 
 db = 'taxo.csv'
 keys = ['Pnviojv', 'Pnvioad','SxPrFAC'] #'sxdeny', 'SxPrFAC', 'lkemp']
-n_clusters = 3
+n_clusters = 6
 
 ###############################################################################
 #Generate dataset
 taxo = dataToDict(db)
-data = remove_none([taxo[key] for key in keys])
+data = [taxo[key] for key in keys]
+remove_none(data)
 X = np.array(data).transpose()
 
 ###############################################################################
