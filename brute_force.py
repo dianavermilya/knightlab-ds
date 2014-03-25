@@ -42,18 +42,41 @@ def AllPairs(d, comp = thinkstats2.Corr):
     key_pairs = ChooseTwo(numeric_keys)
     return [(abs(KeyCompare(d,*pair, comp = comp)),) + pair for pair in key_pairs]
 
-def Interestingness(l1, l2):
+def MostRelated(d, variable, metric = thinkstats2.Corr):
     """
-    Given a dictionary, and two keys, returns an interestingness value, based on assuming alternately that l2 depends on l1 and vice versa.
+    Given a dictionary and a key, find the n best matches where comp is used to 
+    calculate the match
+    """
+    
+    numeric_keys = [key for key in d["__numeric__"] if key in d["__relevant__"]]
+    matches = [(abs(KeyCompare(d, variable, other, comp = metric)), other) for other in numeric_keys if other != variable]
+    #import pdb; pdb.set_trace()
+    return matches
+    
+def MomentAnalysis(l1, l2):
+    """
+    Given a dictionary, and two keys, returns an MomentAnalysis value, based on assuming alternately that l2 depends on l1 and vice versa.
     """
     
     # we don't care which is the independant or depandant variable
     # except for some reason, using l1 seems to work better
-    return max(Interest(l1,l2), Interest(l2,l1))
+    return  max(Moment(l1,l2),Moment(l2,l1))  #- Moment(l2,l1),  Moment(l2,l1) - Moment(l1,l2))
 
-def Interest(l1, l2):
+def WeightedCorr(l1,l2):
     """
-    Tries to say how interesting l1 is as a predictor of l2.
+    simply weights the corrolation by the sqrt of the number of data points
+    """
+    
+    return thinkstats2.SpearmanCorr(l1,l2)*math.sqrt(len(l1))
+
+def CombinedMetrics(l1,l2):
+    
+    return (3*MomentAnalysis(l1,l2) + 2*WeightedCorr(l1,l2))/5
+
+
+def Moment(l1, l2):
+    """
+    Tries to say how Momenting l1 is as a predictor of l2.
     """
     
     points = zip(l1,l2)
@@ -61,7 +84,7 @@ def Interest(l1, l2):
     l1max = max(l1)
     l2var = numpy.var(l2)
     
-    # not interesting cases
+    # not Momenting cases
     if l1min == l1max or l2var == 0:
         return 0
 
@@ -79,17 +102,18 @@ def Interest(l1, l2):
         
         point_bins[index].append(p[1])
     
-    # we define the interestingness of a bin to be the squared difference
+    # we define the MomentAnalysis of a bin to be the squared difference
     # of the median in the bin to the median of all l2 values, times the
     # number of items in the bin   
     l2median = numpy.median(l2)
-    interest_value = 0
+    Moment_value = 0
     for pbin in point_bins:
         if len(pbin)>0:
             diff = numpy.median(pbin) - l2median
-            interest_value += math.sqrt(diff**2*math.sqrt(len(pbin)))/math.sqrt(l2var)
+            Moment_value += math.sqrt(diff**2*math.sqrt(len(pbin)))/math.sqrt(l2var)
     
-    return interest_value
+    return Moment_value
+
 
 def Scatter(d, var1, var2, **kwargs):
     """scatter plots the various data, and prints info on it.
@@ -98,20 +122,22 @@ def Scatter(d, var1, var2, **kwargs):
     ys = list(d[var2])
     data = remove_none([xs,ys])
     
+    #data[0] = [math.sqrt(float(x)) for x in data[0]]
+    #data[1] = [math.sqrt(float(y)) for y in data[1]]
+
     print 'Spearman corr', thinkstats2.SpearmanCorr(data[0], data[1]), 'for ' + var1 + ' vs ' + var2
-    
-    print 'interest', Interestingness(data[0],data[1]), 'for ' + var1 + ' vs ' + var2
-    
+    print 'Moment', MomentAnalysis(data[0],data[1]), 'for ' + var1 + ' vs ' + var2
     thinkplot.Scatter(data[0], data[1], **kwargs)
     thinkplot.show()
 
 if __name__ == '__main__':
-    #beths = dataToDict('beths.csv')
+    beths = dataToDict('beths.csv')
     taxo = dataToDict('taxo.csv')
-
-    all_corrs = AllPairs(taxo, comp = Interestingness)
+    
+    #Scatter (taxo, 'ParaRat', 'Sadtot')
+    all_corrs = AllPairs(taxo, comp = CombinedMetrics)
     all_corrs.sort(reverse=True)
     print all_corrs[:19]
-    for c in all_corrs[:19]:
-        Scatter(taxo, c[1], c[2], label = c[1] + " vs " + c[2])
-\
+    #for c in all_corrs[:29]:
+    #    Scatter(taxo, c[1], c[2], label = c[1] + " vs " + c[2])
+    
