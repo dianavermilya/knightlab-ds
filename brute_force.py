@@ -98,7 +98,7 @@ def Moment(l1, l2):
     for p in points:
         index = int((p[0] - l1min)/width)
         if index >= num_bins:
-            index = num_bins - 1;
+            index = num_bins - 1
         
         point_bins[index].append(p[1])
     
@@ -135,9 +135,9 @@ if __name__ == '__main__':
     taxo = dataToDict('taxo.csv')
     
     #Scatter (taxo, 'ParaRat', 'Sadtot')
-    all_corrs = AllPairs(taxo, comp = CombinedMetrics)
+    all_corrs = AllPairs(beths, comp = MomentAnalysis)
     all_corrs.sort(reverse=True)
     print all_corrs[:19]
-    #for c in all_corrs[:29]:
-    #    Scatter(taxo, c[1], c[2], label = c[1] + " vs " + c[2])
+    for c in all_corrs[:29]:
+        Scatter(beths, c[1], c[2], label = c[1] + " vs " + c[2])
     

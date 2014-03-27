@@ -23,7 +23,7 @@ class Graph(object):
     and an optional seed
     """
     
-    def __init__(self, d, metric, seed = None):
+    def __init__(self, d, metric, seed):
         """
         d: dictionary from which data is pulled
         metric: how to calculate closeness of variables
@@ -32,14 +32,14 @@ class Graph(object):
         self.d = d
         self.metric = metric
         self.nodes = {} # dict mapping labels to nodes
-
-        if not (seed is None):
-            self.add_node(seed)
+        self.add_node(seed)
     
-    def add_node(self, label, links = []):
+    def add_node(self, label, links = None):
         """
         add a new node to the graph
         """
+        if links == None:
+            links = []
         
         node = Node(label, links)
         self.nodes[label] = node
@@ -74,14 +74,52 @@ class Graph(object):
             index += 1
         
         return links
+    
+    def __str__(self):
+    
+        resp = str(len(self.nodes)) + ' nodes:\n'
+        for node in self.nodes:
+            resp += self.nodes[node].label+ str([link.label for link in self.nodes[node].links])+'\n'
+        
+        return resp
+
+def all_graphs(d, metric):
+    """
+    Given a data dictionary, find all the graphs in it.
+    Returns a list of graphs.
+    """
+    
+    interesting_labels = {key for key in d['__numeric__'] if key in d['__relevant__']}
+    
+    graphs = []
+    while interesting_labels:
+        # pick a label
+        label = interesting_labels.pop()
+        # make a graph
+        new_graph = Graph(d, metric, label)
+        graphs.append(new_graph)
+        # remove the used labels from the set of ones to look at
+        interesting_labels -= set(new_graph.nodes.keys())
+    
+    return graphs
+    
 
 if __name__ == '__main__':
     
     taxo = dataToDict('taxo.csv')
-    graph = Graph(taxo, CombinedMetrics, 'HypSxRat')
+    beths = dataToDict('beths.csv')
+    #graph = Graph(taxo, CombinedMetrics, 'weapcr')
     
-    print len(graph.nodes)
-    for node in graph.nodes:
-        print graph.nodes[node].label, [label.label for label in graph.nodes[node].links]
+    #print graph
+    #print len(graph.nodes)
+    #for node in graph.nodes:
+    #    print graph.nodes[node].label, [label.label for label in graph.nodes[node].links]
+    
+    #print len(all_graphs(taxo, CombinedMetrics))
+    for graph in all_graphs(beths, MomentAnalysis):
+        if len(graph.nodes)>1:
+            print '\n=================\n'
+            print graph
+        
         
         
