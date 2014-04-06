@@ -37,6 +37,15 @@ _digits = re.compile('\d')
 def no_digits(s):
     return not(bool(_digits.search(s)))
 
+def no_digits_keys(d):
+    l = []
+    for key in d["__numeric__"]:
+        if no_digits(key):l.append(key)
+    return l
+
+
+
+
 def dataToDict(filename):
     """
         Turns a csv databse into a dictionarry.
@@ -164,5 +173,6 @@ if __name__ == '__main__':
         
         assert l[0] == [1,3,4]
         assert l[1] == [1,3]
+    print no_digits_keys(dataToDict("taxo.csv"))
     
 

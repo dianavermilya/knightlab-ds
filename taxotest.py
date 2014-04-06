@@ -102,7 +102,7 @@ def Scatter(d, var1, var2, **kwargs):
     ys = list(d[var2])
     RemoveNone(xs,ys)
     
-    print 'Spearman corr', thinkstats2.SpearmanCorr(xs, ys)
+    #print 'Spearman corr', thinkstats2.SpearmanCorr(xs, ys)
     
     thinkplot.Scatter(xs, ys, **kwargs)
     thinkplot.show()
@@ -178,20 +178,15 @@ def contains_digits(d):
     return bool(_digits.search(d))
 
 # I chose to arbitrarily filter out data with digits, because they semmed less useful.
-small_taxo = {key:taxo[key] for key in taxo.keys()[:] if not(contains_digits(key))}
-small_taxo.update({"__numeric__": taxo["__numeric__"]})
-import pdb; pdb.set_trace()
-all_corrs = AllSpearmanCorr(small_taxo)
-all_corrs.sort(reverse=True)
-print all_corrs[:20]
+#small_taxo = {key:taxo[key] for key in taxo.keys()[:] if not(contains_digits(key))}
+#small_taxo.update({"__numeric__": taxo["__numeric__"]})
+#import pdb; pdb.set_trace()
+#all_corrs = AllSpearmanCorr(small_taxo)
+#all_corrs.sort(reverse=True)
+#print all_corrs[:20]
 
-Scatter(taxo, 'sxdeny','SxPrFAC', label="sxdeny vs SxPrFAC")
-Scatter(taxo, 'ExAggbeh', 'JuvDelBehSexual')
-Scatter(taxo, 'ComsxFac', 'anxwom', label="ComsxFac vs anxwom")
-Scatter(taxo, 'Voyeur', 'PCD', label="Voyer vs PCD")
-Scatter(taxo, 'lkemp', 'JuvDrgFc', label="lkemp vs JuvDrgFc")
-Scatter(taxo, 'JuvaslFc', 'JuvDrgFc', label="JuvaslFc vs JuvDrgFc")
-Scatter(taxo, 'asltcomc', 'Pnchldjv', label="asltcomc vs Pnchldjv")
+Scatter(taxo, 'HypSxRat','SxPrFAC', label="age vs JuvDelFc")
+
 #AgeCdf(beths)
 #AgeCdf(taxo)
 
