@@ -165,4 +165,7 @@ if __name__ == '__main__':
         assert l[0] == [1,3,4]
         assert l[1] == [1,3]
     
+    taxo = dataToDict("taxo.csv")
+    print len(taxo["__relevant__"])
+    print taxo["__relevant__"]
 
