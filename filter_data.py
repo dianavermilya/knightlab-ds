@@ -149,7 +149,7 @@ if __name__ == '__main__':
     assert l[1] == l[0]
     
     l1 = [1,2,3,4,None]
-    l2 = [1, 2,3,None,5]
+    l2 = [1,2,3,None,5]
     l3 = [1,2,None,4,5]
     l4 = [1,None,3,4,5]
     l5 = [None,2,3,4,5]
@@ -175,4 +175,7 @@ if __name__ == '__main__':
         assert l[1] == [1,3]
     print no_digits_keys(dataToDict("taxo.csv"))
     
+    taxo = dataToDict("taxo.csv")
+    print len(taxo["__relevant__"])
+    print taxo["__relevant__"]
 
