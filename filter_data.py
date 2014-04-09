@@ -7,6 +7,8 @@ import codecs
 import datetime
 import warnings
 
+scales = ["JuvDelFc", "JuvDrgFc", "JuvaslFc", "dralcadu", "hoswom", "ComsxFac", "SxPrFAC", "HypSxRat", "ExAggbeh", "ExAggFan", "negmas", "JuvaslFc", "Fetish", "sxdeny", "Pnviojv", "Pnvioad", "Pnchldad", "Pnchldjv", "conchr", "Rconchr", "lkprtkg", "attadhd", "Inhadhd", "sxperanx", "Voyeur", "Exhibit", "Scatol", "Fetish", "ParaRat", "Sadbehr", "sadfanr", "Sadtot", "PCD", "PAcnang", "anxwom", "PAFght", "PAAgFan", "Pnheter", "Pnvio", "Pnearex", "Pnhomo", "impul", "Masadeq", "erecdys", "lkemp"]
+
 def reviseDataType (string):
     """
     Atttempts to turn the string into the appropriate data type
@@ -54,7 +56,8 @@ def dataToDict(filename):
     """
     numeric_key = "__numeric__"
     relevant_key = "__relevant__"
-    d = {numeric_key: [], relevant_key:[]}
+    demographics_key = "__demographics__"
+    d = {numeric_key: [], relevant_key:[], demographics_key:[]}
     f = open(filename, 'r')
     #wr = open("strings" + filename, "w")
     count = 0
@@ -70,6 +73,7 @@ def dataToDict(filename):
     
     # assign all keys that don't contain digits as interesting
     d[relevant_key] = [key for key in keys if no_digits(key)]
+
     
     #start out by assuming everything is numeric
     d[numeric_key] = list(keys)
@@ -82,8 +86,10 @@ def dataToDict(filename):
                 if keys[i] in d[numeric_key]:
                     d[numeric_key].remove(keys[i])
                     count += 1
-            
             d.setdefault(keys[i], []).append(val)
+
+    d[demographics_key] = [n for n in d[relevant_key] if n not in scales]            
+
     print "numeric columns: ", len(keys) - count
     
     return d
@@ -177,4 +183,4 @@ if __name__ == '__main__':
     taxo = dataToDict("taxo.csv")
     print len(taxo["__relevant__"])
     print taxo["__relevant__"]
-
+    print taxo["__demographics__"]
