@@ -38,8 +38,8 @@ def AllPairs(d, comp = thinkstats2.Corr):
     numeric columns in the data dictionary whose keys satisfy the filter function
     """
     
-    numeric_keys = [key for key in d["__numeric__"] if key in d["__relevant__"]]
-    key_pairs = ChooseTwo(numeric_keys)
+    # numeric_keys = [key for key in d["__numeric__"] if key in d["__relevant__"]]
+    key_pairs = ChooseTwo(d.keys())
     return [(abs(KeyCompare(d,*pair, comp = comp)),) + pair for pair in key_pairs]
 
 def MostRelated(d, variable, metric = thinkstats2.Corr):
@@ -48,14 +48,13 @@ def MostRelated(d, variable, metric = thinkstats2.Corr):
     calculate the match
     """
     
-    numeric_keys = [key for key in d["__numeric__"] if key in d["__relevant__"]]
-    matches = [(abs(KeyCompare(d, variable, other, comp = metric)), other) for other in numeric_keys if other != variable]
-    #import pdb; pdb.set_trace()
+    #numeric_keys = [key for key in d["__numeric__"] if key in d["__relevant__"]]
+    matches = [(abs(KeyCompare(d, variable, other, comp = metric)), other) for other in d if other != variable]
     return matches
     
 def MomentAnalysis(l1, l2):
     """
-    Given a dictionary, and two keys, returns an MomentAnalysis value, based on assuming alternately that l2 depends on l1 and vice versa.
+    Given a dictionary, and two keys, returns an MomentAnalysis value, based on assuming alternately that l2 depends on l1 and vice versa. :)
     """
     
     # we don't care which is the independant or depandant variable

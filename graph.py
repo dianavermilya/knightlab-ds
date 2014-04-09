@@ -1,4 +1,5 @@
 from brute_force import *
+from scales import *
 
 class Node(object):
     """
@@ -68,7 +69,7 @@ class Graph(object):
         
         links = []
         index = 0
-        cutoff = 30;
+        cutoff = 35;
         while potential_links[index][0] > cutoff:
             links.append(potential_links[index][1])
             index += 1
@@ -116,10 +117,32 @@ if __name__ == '__main__':
     #    print graph.nodes[node].label, [label.label for label in graph.nodes[node].links]
     
     #print len(all_graphs(taxo, CombinedMetrics))
-    for graph in all_graphs(beths, MomentAnalysis):
-        if len(graph.nodes)>1:
-            print '\n=================\n'
-            print graph
-        
-        
-        
+    #for graph in all_graphs(taxo, MomentAnalysis):
+    #    if len(graph.nodes)>1:
+    #        print '\n=================\n'
+    #        print graph
+    
+    scales.extend(demographics)
+    reduced_taxo = {scale:taxo[scale] for scale in scales}
+    label = 'Pnheter'
+    
+    graph = Graph(reduced_taxo, MomentAnalysis, label)
+    print graph
+    
+    print '\n==========\n'
+    print 'MomentAnalysis'
+    related = MostRelated(reduced_taxo, label, MomentAnalysis)
+    related.sort(reverse = True)
+    print related
+    
+    print '\n==========\n'
+    print 'WeightedCorr'
+    related = MostRelated(reduced_taxo, label, WeightedCorr)    
+    related.sort(reverse = True)
+    print related
+    
+    print '\n==========\n'
+    print 'Corr'
+    related = MostRelated(reduced_taxo, label)    
+    related.sort(reverse = True)
+    print related
