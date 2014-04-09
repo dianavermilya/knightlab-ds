@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import rpy2.robjects as robjects
 r = robjects.r
 
-import agemodel
+#import agemodel
 
 
 """
@@ -112,25 +112,36 @@ def PrintSummary(res):
 def main(script, model_number=0):
     
     taxo = dataToDict("taxo.csv")
-    hypsxrat = taxo["hypsxrat"]
+    hypsxrat = taxo["HypSxRat"]
     gender = taxo["genderversion"]
     Pnheter = taxo["Pnheter"]
-    Pnheter2 = [d**2 for d in Pnheter]
-
+    sxdeny = taxo["sxdeny"]
+    
+    [sxdeny, hypsxrat, gender, Pnheter] = remove_none([sxdeny, hypsxrat, gender, Pnheter])
+    Pnheter2 = [d**2 for d in Pnheter]    
     model_number = int(model_number)
-
+    
+    plt.scatter(hypsxrat, gender)
+    plt.show()
+    plt.scatter(hypsxrat, Pnheter)
+    plt.show()    
+    plt.scatter(hypsxrat, sxdeny)
+    plt.show()
     # put the data into the R environment
     robjects.globalenv['hypsxrat'] = robjects.FloatVector(hypsxrat)
     robjects.globalenv['Pnheter'] = robjects.FloatVector(Pnheter)
     robjects.globalenv['Pnheter2'] = robjects.FloatVector(Pnheter2)
     robjects.globalenv['gender'] = robjects.FloatVector(gender)
-
+    robjects.globalenv['sxdeny'] = robjects.FloatVector(sxdeny)
     # run the models
     models = ['hypsxrat ~ Pnheter',
               'hypsxrat ~ gender',
               'hypsxrat ~ Pnheter2 + Pnheter',
               'hypsxrat ~ Pnheter2 + Pnheter + gender',
-              'Pnheter ~ gender']
+              'Pnheter ~ gender',
+              'hypsxrat ~ sxdeny',
+              'hypsxrat ~ sxdeny + Pnheter',
+              'hypsxrat ~ sxdeny + Pnheter + gender']
 
 
     model = models[model_number]

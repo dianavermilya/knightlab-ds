@@ -124,7 +124,7 @@ if __name__ == '__main__':
     
     scales.extend(demographics)
     reduced_taxo = {scale:taxo[scale] for scale in scales}
-    label = 'Pnheter'
+    label = 'HypSxRat'
     
     graph = Graph(reduced_taxo, MomentAnalysis, label)
     print graph

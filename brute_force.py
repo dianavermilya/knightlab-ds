@@ -2,6 +2,7 @@ import math
 import thinkplot
 import thinkstats2
 import numpy
+from scales import *
 from filter_data import dataToDict, remove_none
 
 def ChooseTwo(l):
@@ -134,9 +135,10 @@ if __name__ == '__main__':
     taxo = dataToDict('taxo.csv')
     
     #Scatter (taxo, 'ParaRat', 'Sadtot')
-    all_corrs = AllPairs(beths, comp = MomentAnalysis)
+    reduced_taxo = {scale:taxo[scale] for scale in scales}
+    all_corrs = AllPairs(reduced_taxo, MomentAnalysis)
     all_corrs.sort(reverse=True)
     print all_corrs[:19]
     for c in all_corrs[:29]:
-        Scatter(beths, c[1], c[2], label = c[1] + " vs " + c[2])
+        Scatter(taxo, c[1], c[2], label = c[1] + " vs " + c[2])
     
