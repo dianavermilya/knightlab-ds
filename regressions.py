@@ -1,4 +1,5 @@
 import thinkstats2
+import math
 from filter_data import dataToDict, remove_none
 import matplotlib.pyplot as plt
 import rpy2.robjects as robjects
@@ -90,7 +91,8 @@ def RunModel(model, print_flag=True):
     model = r(model)
     res = r.lm(model)
     if print_flag:
-        PrintSummary(res)
+        #PrintSummary(res)
+        print ResStdError(res)
     return res
 
 
@@ -108,6 +110,13 @@ def PrintSummary(res):
             print line
     print
 
+def ResStdError(res):
+    lines = str(r.summary(res))
+    for line in lines.split('\n'):
+        # extract the residual standard error
+        if line.startswith('Residual standard error'):
+            rse = float(line.replace('Residual standard error: ','')[:6])
+    return rse
 
 def main(script, model_number=0):
     
@@ -116,23 +125,30 @@ def main(script, model_number=0):
     gender = taxo["genderversion"]
     Pnheter = taxo["Pnheter"]
     sxdeny = taxo["sxdeny"]
+
+    comsxfac = taxo["ComsxFac"]
+    sxprfac = taxo["SxPrFAC"]
     
-    [sxdeny, hypsxrat, gender, Pnheter] = remove_none([sxdeny, hypsxrat, gender, Pnheter])
+    #import pdb; pdb.set_trace()
+    [sxdeny, hypsxrat, gender, Pnheter, comsxfac, sxprfac] = remove_none([sxdeny, hypsxrat, gender, Pnheter, comsxfac, sxprfac])
     Pnheter2 = [d**2 for d in Pnheter]    
     model_number = int(model_number)
     
-    plt.scatter(hypsxrat, gender)
-    plt.show()
-    plt.scatter(hypsxrat, Pnheter)
-    plt.show()    
-    plt.scatter(hypsxrat, sxdeny)
-    plt.show()
+    #plt.scatter(hypsxrat, gender)
+    #plt.show()
+    #plt.scatter(hypsxrat, Pnheter)
+    #plt.show()    
+    #plt.scatter(hypsxrat, sxdeny)
+    #plt.show()
     # put the data into the R environment
     robjects.globalenv['hypsxrat'] = robjects.FloatVector(hypsxrat)
     robjects.globalenv['Pnheter'] = robjects.FloatVector(Pnheter)
     robjects.globalenv['Pnheter2'] = robjects.FloatVector(Pnheter2)
     robjects.globalenv['gender'] = robjects.FloatVector(gender)
     robjects.globalenv['sxdeny'] = robjects.FloatVector(sxdeny)
+    robjects.globalenv['comsxfac'] = robjects.FloatVector(comsxfac)
+    robjects.globalenv['sxprfac'] = robjects.FloatVector(sxprfac)
+    
     # run the models
     models = ['hypsxrat ~ Pnheter',
               'hypsxrat ~ gender',
@@ -141,12 +157,16 @@ def main(script, model_number=0):
               'Pnheter ~ gender',
               'hypsxrat ~ sxdeny',
               'hypsxrat ~ sxdeny + Pnheter',
-              'hypsxrat ~ sxdeny + Pnheter + gender']
+              'hypsxrat ~ sxdeny + Pnheter + gender',
+              'hypsxrat ~ comsxfac + sxprfac + sxdeny + gender + Pnheter']
 
 
     model = models[model_number]
     print model
-    RunModel(model)
+    std_dev =  math.sqrt(thinkstats2.Var(hypsxrat, ddof = 1))
+    print std_dev    
+    res = RunModel(model)
+    print (std_dev - ResStdError(res))/std_dev
 
 
 if __name__ == '__main__':
