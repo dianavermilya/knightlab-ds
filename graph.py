@@ -69,7 +69,7 @@ class Graph(object):
         
         links = []
         index = 0
-        cutoff = 35;
+        cutoff = 20;
         while potential_links[index][0] > cutoff:
             links.append(potential_links[index][1])
             index += 1
@@ -126,23 +126,23 @@ if __name__ == '__main__':
     reduced_taxo = {scale:taxo[scale] for scale in scales}
     label = 'HypSxRat'
     
-    graph = Graph(reduced_taxo, MomentAnalysis, label)
+    graph = Graph(reduced_taxo, WeightedCorr, label)
     print graph
     
-    print '\n==========\n'
-    print 'MomentAnalysis'
-    related = MostRelated(reduced_taxo, label, MomentAnalysis)
-    related.sort(reverse = True)
-    print related
+    #print '\n==========\n'
+    #print 'MomentAnalysis'
+    #related = MostRelated(reduced_taxo, label, MomentAnalysis)
+    #related.sort(reverse = True)
+    #print related
+    #
+    #print '\n==========\n'
+    #print 'WeightedCorr'
+    #related = MostRelated(reduced_taxo, label, WeightedCorr)    
+    #related.sort(reverse = True)
+    #print related
     
-    print '\n==========\n'
-    print 'WeightedCorr'
-    related = MostRelated(reduced_taxo, label, WeightedCorr)    
-    related.sort(reverse = True)
-    print related
-    
-    print '\n==========\n'
-    print 'Corr'
-    related = MostRelated(reduced_taxo, label)    
-    related.sort(reverse = True)
-    print related
+    #print '\n==========\n'
+    #print 'Corr'
+    #related = MostRelated(reduced_taxo, label)    
+    #related.sort(reverse = True)
+    #print related
