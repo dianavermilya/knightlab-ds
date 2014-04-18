@@ -122,7 +122,6 @@ if __name__ == '__main__':
     #        print '\n=================\n'
     #        print graph
     
-    scales.extend(demographics)
     reduced_taxo = {scale:taxo[scale] for scale in scales}
     label = 'HypSxRat'
     

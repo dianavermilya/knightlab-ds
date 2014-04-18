@@ -41,9 +41,7 @@ scales = ['JuvDelFc',
 'impul',
 'Masadeq',
 'erecdys',
-'lkemp']
-
-demographics = [
+'lkemp',
 'age',
 'drug_adult_rave',
 'drug_use_adult',

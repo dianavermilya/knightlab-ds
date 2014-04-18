@@ -6,8 +6,9 @@ import thinkstats2
 import codecs
 import datetime
 import warnings
+from scales import *
 
-scales = ["JuvDelFc", "JuvDrgFc", "JuvaslFc", "dralcadu", "hoswom", "ComsxFac", "SxPrFAC", "HypSxRat", "ExAggbeh", "ExAggFan", "negmas", "JuvaslFc", "Fetish", "sxdeny", "Pnviojv", "Pnvioad", "Pnchldad", "Pnchldjv", "conchr", "Rconchr", "lkprtkg", "attadhd", "Inhadhd", "sxperanx", "Voyeur", "Exhibit", "Scatol", "Fetish", "ParaRat", "Sadbehr", "sadfanr", "Sadtot", "PCD", "PAcnang", "anxwom", "PAFght", "PAAgFan", "Pnheter", "Pnvio", "Pnearex", "Pnhomo", "impul", "Masadeq", "erecdys", "lkemp"]
+#scales = ["JuvDelFc", "JuvDrgFc", "JuvaslFc", "dralcadu", "hoswom", "ComsxFac", "SxPrFAC", "HypSxRat", "ExAggbeh", "ExAggFan", "negmas", "JuvaslFc", "Fetish", "sxdeny", "Pnviojv", "Pnvioad", "Pnchldad", "Pnchldjv", "conchr", "Rconchr", "lkprtkg", "attadhd", "Inhadhd", "sxperanx", "Voyeur", "Exhibit", "Scatol", "Fetish", "ParaRat", "Sadbehr", "sadfanr", "Sadtot", "PCD", "PAcnang", "anxwom", "PAFght", "PAAgFan", "Pnheter", "Pnvio", "Pnearex", "Pnhomo", "impul", "Masadeq", "erecdys", "lkemp"]
 
 def reviseDataType (string):
     """
@@ -121,7 +122,7 @@ def remove_none(listOfLists):
     # check that they are all the same length, of not raise warning
     for el in newLists:
         if len(el) != length:
-            warnings.warn("Arrays not te same length!!")
+            warnings.warn("Arrays not the same length!!")
     
     # this is probably the ugliest code I have ever written :(
     index = 0
@@ -134,12 +135,35 @@ def remove_none(listOfLists):
                     array.pop(index)       
                 length -= 1
                 break
-
         # only increment index if we didn't remove any items
         if old_length == length:
             index += 1
      
     return newLists
+    
+def restrict(d, gender):
+    """
+    gender should be 'male' or 'female'
+    """
+    
+    if gender.lower() == 'male':
+        genderversion = 1
+    elif gender.lower() == 'female':
+        genderversion = 0
+    else:
+        raise ValueError("Non binary gender given... sincerest apologies for not knowing how to deal with it.  I am a computer after all :(")
+    
+    indexes_to_keep = []
+    for i in range(len(d['genderversion'])):
+        if d['genderversion'][i] == genderversion:
+            indexes_to_keep.append(i)
+    
+    # remove all entries that don't have the right gender
+    new_d = {}
+    for key in d:
+        new_d[key] = [d[key][i] for i in indexes_to_keep]
+    
+    return new_d
 
 if __name__ == '__main__':
     l1 = [1,2,3,None]
@@ -175,12 +199,21 @@ if __name__ == '__main__':
     with warnings.catch_warnings(record=True) as w:
         l = remove_none([[1,None,3,4],[1,2,3]])
         assert len(w) == 1
-        assert "Arrays not te same length!!" in w[0].message
+        assert "Arrays not the same length!!" in w[0].message
         
         assert l[0] == [1,3,4]
         assert l[1] == [1,3]
     
     taxo = dataToDict("taxo.csv")
-    print len(taxo["__relevant__"])
-    print taxo["__relevant__"]
-    print taxo["__demographics__"]
+    reduced_taxo = {scale:taxo[scale] for scale in scales}
+    #print len(taxo["__relevant__"])
+    #print taxo["__relevant__"]
+    #print taxo["__demographics__"]
+    
+    male_taxo = restrict(reduced_taxo, 'male')
+    assert not(0 in male_taxo['genderversion'])
+    assert 1 in male_taxo['genderversion']
+    
+    female_taxo = restrict(reduced_taxo, 'female')
+    assert not(1 in female_taxo['genderversion'])
+    assert 0 in female_taxo['genderversion']

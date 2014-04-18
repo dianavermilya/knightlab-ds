@@ -1,9 +1,10 @@
 import thinkstats2
 import math
-from filter_data import dataToDict, remove_none
+from filter_data import dataToDict, remove_none, restrict
 import matplotlib.pyplot as plt
 import rpy2.robjects as robjects
 import itertools
+from scales import *
 r = robjects.r
 
 #import agemodel
@@ -133,7 +134,8 @@ def makeModel(d, *scales):
     
     #remove none values
     data = remove_none(data)
-    
+    if len(data[0]) == 0:
+        print data, scales
     # create the r global objects
     for i in range(len(scales)):
         robjects.globalenv[str(scales[i])] = robjects.FloatVector(data[i])
@@ -163,7 +165,8 @@ def allModels(d, *scales):
     model_results = []
     for combo in explanitory_combinations:
         model = makeModel(data, scales[0], *combo)
-        model_results.append((ResStdError(RunModel(model, print_flag=False)), model))
+        power = modelPower(RunModel(model, print_flag=False), data[scales[0]])
+        model_results.append((ResStdError(RunModel(model, print_flag=False)), power, model))
     
     model_results.sort()
     return model_results
@@ -178,11 +181,43 @@ def allSubsets(iterable):
         subsets.extend(itertools.combinations(iterable, i))
     return subsets
 
+def modelPower(res, variable):
+    """
+    return the amount by which the standerd deviation has decreased using this model
+    
+    res: result from running the model
+    variable: thing the model was measuring
+    """
+    
+    # extract the residual standard error from the report
+    std_er = ResStdError(res)
+    var = [datum for datum in variable if not(datum is None)]
+    
+    # calculate the initial standard deviation
+    std_dev =  math.sqrt(thinkstats2.Var(var, ddof = 1))
+    
+    # report improvement
+    return (std_dev - ResStdError(res))/std_dev
 
 def main(script, model_number=0):
     
     taxo = dataToDict("taxo.csv")
-    print allModels(taxo, "HypSxRat", "genderversion", "Pnheter", "sxdeny")[:10]
+    reduced_taxo = {scale:taxo[scale] for scale in scales}
+    taxo_m = restrict(reduced_taxo,'male')
+    taxo_f = restrict(reduced_taxo,'female')
+    
+    print allModels(taxo, "HypSxRat", "genderversion", "Pnheter", "sxdeny")[:2]
+    #print allModels(taxo, "ComsxFac", "genderversion", "Pnheter", "sxdeny")[:2]
+    #print allModels(taxo, "SxPrFAC", "genderversion", "Pnheter", "sxdeny")[:2]
+    #print allModels(taxo, "HypSxRat", "genderversion", "Pnheter", "SxPrFAC")[:2]
+    
+    print "\n ======== Gender Specific ========\n"
+    print allModels(taxo_f, "HypSxRat", "Pnheter", "drug_use_teen")[:2]
+    
+    from brute_force import Scatter
+    Scatter(taxo_f, "HypSxRat", "Pnheter")
+    Scatter(taxo_f, "HypSxRat", "drug_use_teen")
+    Scatter(reduced_taxo, "HypSxRat", "sxdeny")
     #hypsxrat = taxo["HypSxRat"]
     #gender = taxo["genderversion"]
     #Pnheter = taxo["Pnheter"]
@@ -191,7 +226,6 @@ def main(script, model_number=0):
     #comsxfac = taxo["ComsxFac"]
     #sxprfac = taxo["SxPrFAC"]
     
-    #import pdb; pdb.set_trace()
     #[sxdeny, hypsxrat, gender, Pnheter, comsxfac, sxprfac] = remove_none([sxdeny, hypsxrat, gender, Pnheter, comsxfac, sxprfac])
     #Pnheter2 = [d**2 for d in Pnheter]    
     #model_number = int(model_number)
