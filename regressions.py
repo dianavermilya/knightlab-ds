@@ -143,6 +143,28 @@ def makeModel(d, *scales):
     model = '{} ~ {}'.format(scales[0], ' + '.join(scales[1:]))
     return model
 
+def ellementPower(model):
+    """
+    Returns the explanitory power of each variable used in the model
+    """
+    
+    initial_std_er = ResStdError(RunModel(model, print_flag=False))
+    
+    # first step is to extract the explanitory variables
+    [dependant, variables] = model.split('~')
+    dependant = dependant.strip()
+    variables = [var.strip() for var in variables.split('+')]
+    
+    # now create a model without each 
+    models = []
+    error_deltas = []
+    for var_to_inspect  in variables:
+        model = '{} ~ {}'.format(dependant, ' + '.join([var for var in variables if not(var == var_to_inspect)]))
+        models.append(model)
+		# compute how much the error increased by removing that variable
+        error_increase = ResStdError(RunModel(model, print_flag = False)) - initial_std_er
+        error_deltas.append((error_increase, var_to_inspect))
+    return error_deltas
 
 def allModels(d, *scales):
     """
@@ -157,7 +179,7 @@ def allModels(d, *scales):
     for scale in list(scales[1:]):
         name = scale+'2'
         data[name] = [datum**2 if not datum is None else None for datum in data[scale]]
-        scales.append(name)
+        #scales.append(name)
     
     # now form all possible combinations of explanitory variables
     explanitory_combinations = allSubsets(list(scales[1:]))
@@ -170,7 +192,6 @@ def allModels(d, *scales):
     
     model_results.sort()
     return model_results
-
 
 def allSubsets(iterable):
     """
@@ -206,18 +227,28 @@ def main(script, model_number=0):
     taxo_m = restrict(reduced_taxo,'male')
     taxo_f = restrict(reduced_taxo,'female')
     
-    print allModels(taxo, "HypSxRat", "genderversion", "Pnheter", "sxdeny")[:2]
+    model_tuple = allModels(taxo_m, "HypSxRat", "Pnheter", "Sadtot", "sxdeny", "JuvDrgFc")[0]
+    print model_tuple
+    print ellementPower(model_tuple[-1])
+    model_tuple = allModels(taxo_f, "HypSxRat", "Pnheter", "JuvDrgFc", "Pnearex")[0]
+    print model_tuple
+    print ellementPower(model_tuple[-1])
     #print allModels(taxo, "ComsxFac", "genderversion", "Pnheter", "sxdeny")[:2]
     #print allModels(taxo, "SxPrFAC", "genderversion", "Pnheter", "sxdeny")[:2]
     #print allModels(taxo, "HypSxRat", "genderversion", "Pnheter", "SxPrFAC")[:2]
     
-    print "\n ======== Gender Specific ========\n"
-    print allModels(taxo_f, "HypSxRat", "Pnheter", "drug_use_teen")[:2]
-    
+    #print "\n ======== Gender Specific ========\n"
+    #print allModels(taxo_f, "HypSxRat", "Pnheter", "drug_use_teen", "sxdeny")[:2]
+    #print allModels(taxo_f, "HypSxRat", "Pnheter", "JuvDrgFc", "sxdeny")[:2]
+    #print allModels(taxo_f, "HypSxRat", "Pnheter", "drug_use_teen", "Pnhomo")[:2]
     from brute_force import Scatter
-    Scatter(taxo_f, "HypSxRat", "Pnheter")
-    Scatter(taxo_f, "HypSxRat", "drug_use_teen")
-    Scatter(reduced_taxo, "HypSxRat", "sxdeny")
+    #Scatter(taxo_f, "HypSxRat", "Pnheter")
+    #Scatter(taxo_m, "HypSxRat", "Pnheter")
+    #Scatter(taxo_f, "HypSxRat", "Pnearex")
+    #Scatter(taxo_m, "HypSxRat", "Pnearex")
+    #Scatter(taxo_f, "HypSxRat", "JuvDrgFc")
+    #Scatter(taxo_m, "HypSxRat", "JuvDrgFc")
+    #Scatter(reduced_taxo, "HypSxRat", "sxdeny")
     #hypsxrat = taxo["HypSxRat"]
     #gender = taxo["genderversion"]
     #Pnheter = taxo["Pnheter"]

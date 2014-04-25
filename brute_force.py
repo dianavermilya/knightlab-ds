@@ -126,9 +126,34 @@ def Scatter(d, var1, var2, **kwargs):
     #data[1] = [math.sqrt(float(y)) for y in data[1]]
 
     print 'Spearman corr', thinkstats2.SpearmanCorr(data[0], data[1]), 'for ' + var1 + ' vs ' + var2
+    print 'Pearson Corr', thinkstats2.Corr(data[0], data[1]), 'for ' + var1 + ' vs ' + var2
     print 'Moment', MomentAnalysis(data[0],data[1]), 'for ' + var1 + ' vs ' + var2
     thinkplot.Scatter(data[0], data[1], **kwargs)
     thinkplot.show()
+
+def JavaGraph(d):
+    """
+    create the matrix used by the javascript visualizer
+    """
+    
+    # sort the variables alphabetically
+    scales = [key for key in d]
+    scales.sort()
+    
+    comps = [MomentAnalysis, WeightedCorr, thinkstats2.Corr]
+    
+    matrix = []
+    for scale in scales:
+        matrix.append([KeyCompare(d, scale, other) for other in scales])
+    
+    fp = open("javagraph.txt", "w")
+    fp.write(str(scales)+'\n')
+    fp.write(str(matrix))
+    
+    #for row in rows:
+    #    fp.write(str(row)+'\n')
+    
+    fp.close()
 
 if __name__ == '__main__':
     beths = dataToDict('beths.csv')
@@ -138,7 +163,11 @@ if __name__ == '__main__':
     reduced_taxo = {scale:taxo[scale] for scale in scales}
     all_corrs = AllPairs(reduced_taxo, MomentAnalysis)
     all_corrs.sort(reverse=True)
-    print all_corrs[:19]
-    for c in all_corrs[:29]:
-        Scatter(taxo, c[1], c[2], label = c[1] + " vs " + c[2])
+    #print all_corrs[:19]
+    #for c in all_corrs[:29]:
+    #    Scatter(taxo, c[1], c[2], label = c[1] + " vs " + c[2])
+    
+    print "\n ======== \n"
+    
+    print JavaGraph(reduced_taxo)
     
