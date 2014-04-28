@@ -26,7 +26,7 @@ def statSig(scale1, scale2):
     actual_diff = genderCorrs(scale1, scale2)[0]
     
     n = 5000
-    rand_diffs = randomGenderPMF(scale1, scale2, n)
+    rand_diffs = randomDiffs(scale1, scale2, n)
     
     # compute how many are greater that the actual_diff
     num_greater = 0
@@ -36,7 +36,7 @@ def statSig(scale1, scale2):
     
     return float(num_greater)/n
 
-def randomGenderPMF(scale1, scale2, n = 1000):
+def randomDiffs(scale1, scale2, n = 1000):
     """
     randomely partition the dictionary into two sets the sizes of the gender sets
     and compute the PMF for the difference in corrolations
@@ -76,33 +76,51 @@ def randomGenderPMF(scale1, scale2, n = 1000):
     # thinkplot.show()
     return diff
 
+def PMFDiff(scale1, scale2):
+    """
+    create (and plot) the PMF of the differences in corrolations between the scales
+    based on gender.
+    """
+    
+    # more the merrier (and slower)
+    n = 10000
+    
+    # create the diff
+    diff = randomDiffs(scale1, scale2, n)
 
-if __name__ == "__main__":
+    diff = [round(num, 3) for num in diff]
+    pmf = MakePmfFromList(diff)
+    thinkplot.Pmf(pmf)
+    thinkplot.show()
+    
+
+def allDiffs():
     hyp_sex_factors = ["HypSxRat", "ComsxFac", "SxPrFAC"]
-    all_factors = scales
     threshold = 0.05
     
-    fp = open("gender_diffs.txt", 'w')
+    fp = open("gender_diffs2.txt", 'w')
     for sex_scale in hyp_sex_factors:
         for scale in scales:
             if scale != sex_scale and scale != "genderversion":
-                significance = statSig(sex_scale, scale)
+                p_val = statSig(sex_scale, scale)
                 # record significant differences
-                if (significance < threshold) or (1-significance < threshold):
-                    write_string = "Scales: {} {}, Difference: {:.4F}, Significance: {:.4F}\n".format(sex_scale, scale, genderCorrs("HypSxRat", scale)[0], significance)
+                if (p_val < threshold):
+                    write_string = "Scales: {} {},\tDiff: {:.4F},\tp: {:.4F}\n".format(sex_scale, scale, genderCorrs(sex_scale, scale)[0], p_val)
                     print write_string
                     fp.write(write_string)
     
     fp.close()
+
+if __name__ == "__main__":
     
-    #print genderCorrs("HypSxRat", "Pnheter"), statSig("HypSxRat", "Pnheter")
-    #print genderCorrs("HypSxRat", "sxdeny"), statSig("HypSxRat", "sxdeny")
-    #print genderCorrs("HypSxRat", "ParaRat"), statSig("HypSxRat", "ParaRat")
-    #print genderCorrs("HypSxRat", "Voyeur"), statSig("HypSxRat", "Voyeur")
-    #print genderCorrs("HypSxRat", "ComsxFac"), statSig("HypSxRat", "ComsxFac")
-    #print genderCorrs("HypSxRat", "SxPrFAC"), statSig("HypSxRat", "SxPrFAC")
-    #print genderCorrs("HypSxRat", "PCD"), statSig("HypSxRat", "PCD")
-    #print genderCorrs("HypSxRat", "Fetish"), statSig("HypSxRat", "Fetish")
-    
+    # print genderCorrs("HypSxRat", "Pnheter"), statSig("HypSxRat", "Pnheter")
+    # print genderCorrs("HypSxRat", "sxdeny"), statSig("HypSxRat", "sxdeny")
+    # print genderCorrs("HypSxRat", "ParaRat"), statSig("HypSxRat", "ParaRat")
+    # print genderCorrs("HypSxRat", "Voyeur"), statSig("HypSxRat", "Voyeur")
+    # print genderCorrs("HypSxRat", "ComsxFac"), statSig("HypSxRat", "ComsxFac")
+    # print genderCorrs("HypSxRat", "SxPrFAC"), statSig("HypSxRat", "SxPrFAC")
+    # print genderCorrs("HypSxRat", "PCD"), statSig("HypSxRat", "PCD")
+    # print genderCorrs("HypSxRat", "Fetish"), statSig("HypSxRat", "Fetish")
+    allDiffs()
     
     
