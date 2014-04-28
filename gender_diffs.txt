@@ -1,0 +1,56 @@
+Scales: HypSxRat JuvDelFc, Difference: -0.1615, Significance: 0.0268
+Scales: HypSxRat dralcadu, Difference: -0.2247, Significance: 0.0004
+Scales: HypSxRat hoswom, Difference: 0.1294, Significance: 0.0422
+Scales: HypSxRat ComsxFac, Difference: -0.0537, Significance: 0.0252
+Scales: HypSxRat SxPrFAC, Difference: -0.0765, Significance: 0.0202
+Scales: HypSxRat ExAggbeh, Difference: -0.2099, Significance: 0.0074
+Scales: HypSxRat negmas, Difference: -0.0028, Significance: 0.9660 *
+Scales: HypSxRat sxdeny, Difference: -0.0785, Significance: 0.0320
+Scales: HypSxRat lkprtkg, Difference: -0.0901, Significance: 0.0000
+Scales: HypSxRat sxperanx, Difference: 0.1233, Significance: 0.0476
+Scales: HypSxRat Exhibit, Difference: -0.1682, Significance: 0.0032
+Scales: HypSxRat ParaRat, Difference: -0.0025, Significance: 0.9526 *
+Scales: HypSxRat anxwom, Difference: 0.1849, Significance: 0.0006
+Scales: HypSxRat PAAgFan, Difference: 0.1588, Significance: 0.0036
+Scales: HypSxRat Pnheter, Difference: -0.1368, Significance: 0.0034
+Scales: HypSxRat Pnearex, Difference: -0.2096, Significance: 0.0034
+Scales: HypSxRat Pnhomo, Difference: -0.1933, Significance: 0.0000
+Scales: HypSxRat lkemp, Difference: 0.2298, Significance: 0.0000
+Scales: HypSxRat drug_adult_rave, Difference: -0.2448, Significance: 0.0182
+Scales: HypSxRat drug_use_adult, Difference: -0.2255, Significance: 0.0150
+Scales: HypSxRat raceR, Difference: -0.0400, Significance: 0.0374
+Scales: ComsxFac hoswom, Difference: 0.1294, Significance: 0.0150
+Scales: ComsxFac SxPrFAC, Difference: -0.0765, Significance: 0.0354
+Scales: ComsxFac HypSxRat, Difference: 0.0000, Significance: 0.0270
+Scales: ComsxFac ExAggbeh, Difference: -0.2099, Significance: 0.0198
+Scales: ComsxFac sxdeny, Difference: -0.0785, Significance: 0.0396
+Scales: ComsxFac Pnviojv, Difference: 0.0490, Significance: 0.0032
+Scales: ComsxFac lkprtkg, Difference: -0.0901, Significance: 0.0000
+Scales: ComsxFac Exhibit, Difference: -0.1682, Significance: 0.0188
+Scales: ComsxFac Sadtot, Difference: -0.0616, Significance: 0.9844 *
+Scales: ComsxFac PAAgFan, Difference: 0.1588, Significance: 0.0246
+Scales: ComsxFac Masadeq, Difference: -0.1036, Significance: 0.0454
+Scales: ComsxFac drug_adult_rave, Difference: -0.2448, Significance: 0.0156
+Scales: ComsxFac drug_use_adult, Difference: -0.2255, Significance: 0.0094
+Scales: SxPrFAC hoswom, Difference: 0.1294, Significance: 0.0334
+Scales: SxPrFAC ComsxFac, Difference: -0.0537, Significance: 0.0400
+Scales: SxPrFAC HypSxRat, Difference: 0.0000, Significance: 0.0196
+Scales: SxPrFAC ExAggbeh, Difference: -0.2099, Significance: 0.0000
+Scales: SxPrFAC sxdeny, Difference: -0.0785, Significance: 0.0366
+Scales: SxPrFAC Pnvioad, Difference: 0.0884, Significance: 0.0018
+Scales: SxPrFAC lkprtkg, Difference: -0.0901, Significance: 0.0000
+Scales: SxPrFAC attadhd, Difference: -0.0212, Significance: 0.0204
+Scales: SxPrFAC sadfanr, Difference: 0.0385, Significance: 0.0492
+Scales: SxPrFAC PAcnang, Difference: 0.0838, Significance: 0.0140
+Scales: SxPrFAC anxwom, Difference: 0.1849, Significance: 0.0056
+Scales: SxPrFAC PAAgFan, Difference: 0.1588, Significance: 0.0004
+Scales: SxPrFAC Pnvio, Difference: 0.0884, Significance: 0.0008
+Scales: SxPrFAC Pnhomo, Difference: -0.1933, Significance: 0.0004
+Scales: SxPrFAC impul, Difference: 0.0589, Significance: 0.0090
+Scales: SxPrFAC Masadeq, Difference: -0.1036, Significance: 0.0444
+Scales: SxPrFAC lkemp, Difference: 0.2298, Significance: 0.0266
+Scales: SxPrFAC age, Difference: -0.0321, Significance: 0.0000
+Scales: SxPrFAC drug_adult_rave, Difference: -0.2448, Significance: 0.0166
+Scales: SxPrFAC drug_use_adult, Difference: -0.2255, Significance: 0.0078
+Scales: SxPrFAC drug_use_child, Difference: -0.0578, Significance: 0.9556 *
+Scales: SxPrFAC raceR, Difference: -0.0400, Significance: 0.9946

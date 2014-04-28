@@ -1,6 +1,6 @@
 import thinkstats2
 import math
-from filter_data import dataToDict, remove_none, restrict
+from filter_data import dataToDict, remove_none, restrict, taxo, taxo_m, taxo_f
 import matplotlib.pyplot as plt
 import rpy2.robjects as robjects
 import itertools
@@ -143,12 +143,13 @@ def makeModel(d, *scales):
     model = '{} ~ {}'.format(scales[0], ' + '.join(scales[1:]))
     return model
 
-def ellementPower(model):
+def ellementPower(model_tuple, d = None):
     """
     Returns the explanitory power of each variable used in the model
     """
     
-    initial_std_er = ResStdError(RunModel(model, print_flag=False))
+    initial_std_er = model_tuple[0]
+    model = model_tuple[-1]
     
     # first step is to extract the explanitory variables
     [dependant, variables] = model.split('~')
@@ -161,7 +162,10 @@ def ellementPower(model):
     for var_to_inspect  in variables:
         model = '{} ~ {}'.format(dependant, ' + '.join([var for var in variables if not(var == var_to_inspect)]))
         models.append(model)
-		# compute how much the error increased by removing that variable
+        if not(d is None):
+            model = makeModel(d, *([dependant] + [var for var in variables if not(var == var_to_inspect)]))
+
+        # compute how much the error increased by removing that variable
         error_increase = ResStdError(RunModel(model, print_flag = False)) - initial_std_er
         error_deltas.append((error_increase, var_to_inspect))
     return error_deltas
@@ -215,28 +219,35 @@ def modelPower(res, variable):
     var = [datum for datum in variable if not(datum is None)]
     
     # calculate the initial standard deviation
-    std_dev =  math.sqrt(thinkstats2.Var(var, ddof = 1))
+    std_dev =  math.sqrt(thinkstats2.Var(var, ddof = 2))
     
     # report improvement
     return (std_dev - ResStdError(res))/std_dev
 
 def main(script, model_number=0):
     
-    taxo = dataToDict("taxo.csv")
-    reduced_taxo = {scale:taxo[scale] for scale in scales}
-    taxo_m = restrict(reduced_taxo,'male')
-    taxo_f = restrict(reduced_taxo,'female')
+    #taxo = dataToDict("taxo.csv")
+    #reduced_taxo = {scale:taxo[scale] for scale in scales}
+    #taxo_m = restrict(reduced_taxo,'male')
+    #taxo_f = restrict(reduced_taxo,'female')
     
-    model_tuple = allModels(taxo_m, "HypSxRat", "Pnheter", "Sadtot", "sxdeny", "JuvDrgFc")[0]
+    models = allModels(taxo_m, "HypSxRat", "Pnheter", "Sadtot", "sxdeny", "JuvDrgFc", "Pnearex", "ParaRat", "Voyeur", "SxPrFAC", "ComsxFac", "Fetish", "PCD")
+
+    model_tuple = models[0]
     print model_tuple
-    print ellementPower(model_tuple[-1])
-    model_tuple = allModels(taxo_f, "HypSxRat", "Pnheter", "JuvDrgFc", "Pnearex")[0]
+    print ellementPower(model_tuple, taxo_m)
+    
+    models = allModels(taxo_f, "HypSxRat", "Pnheter", "Sadtot", "sxdeny", "JuvDrgFc", "Pnearex", "ParaRat", "Voyeur", "SxPrFAC", "ComsxFac", "Fetish", "PCD")
+
+    model_tuple = models[0]
     print model_tuple
-    print ellementPower(model_tuple[-1])
+    print ellementPower(model_tuple, taxo_f)
+    
+    #print " === Models === "
     #print allModels(taxo, "ComsxFac", "genderversion", "Pnheter", "sxdeny")[:2]
     #print allModels(taxo, "SxPrFAC", "genderversion", "Pnheter", "sxdeny")[:2]
-    #print allModels(taxo, "HypSxRat", "genderversion", "Pnheter", "SxPrFAC")[:2]
-    
+    #print allModels(taxo, "HypSxRat", "genderversion", 'ComsxFac', 'Voyeur', 'ParaRat', 'sxdeny', 'SxPrFAC')[:2]
+    #print allModels(taxo, "sxdeny", "genderversion", "Pnheter")[:2]
     #print "\n ======== Gender Specific ========\n"
     #print allModels(taxo_f, "HypSxRat", "Pnheter", "drug_use_teen", "sxdeny")[:2]
     #print allModels(taxo_f, "HypSxRat", "Pnheter", "JuvDrgFc", "sxdeny")[:2]
@@ -249,53 +260,7 @@ def main(script, model_number=0):
     #Scatter(taxo_f, "HypSxRat", "JuvDrgFc")
     #Scatter(taxo_m, "HypSxRat", "JuvDrgFc")
     #Scatter(reduced_taxo, "HypSxRat", "sxdeny")
-    #hypsxrat = taxo["HypSxRat"]
-    #gender = taxo["genderversion"]
-    #Pnheter = taxo["Pnheter"]
-    #sxdeny = taxo["sxdeny"]
 
-    #comsxfac = taxo["ComsxFac"]
-    #sxprfac = taxo["SxPrFAC"]
-    
-    #[sxdeny, hypsxrat, gender, Pnheter, comsxfac, sxprfac] = remove_none([sxdeny, hypsxrat, gender, Pnheter, comsxfac, sxprfac])
-    #Pnheter2 = [d**2 for d in Pnheter]    
-    #model_number = int(model_number)
-    
-    #plt.scatter(hypsxrat, gender)
-    #plt.show()
-    #plt.scatter(hypsxrat, Pnheter)
-    #plt.show()    
-    #plt.scatter(hypsxrat, sxdeny)
-    #plt.show()
-    # put the data into the R environment
-    #robjects.globalenv['hypsxrat'] = robjects.FloatVector(hypsxrat)
-    #robjects.globalenv['Pnheter'] = robjects.FloatVector(Pnheter)
-    #robjects.globalenv['Pnheter2'] = robjects.FloatVector(Pnheter2)
-    #robjects.globalenv['gender'] = robjects.FloatVector(gender)
-    #robjects.globalenv['sxdeny'] = robjects.FloatVector(sxdeny)
-    #robjects.globalenv['comsxfac'] = robjects.FloatVector(comsxfac)
-    #robjects.globalenv['sxprfac'] = robjects.FloatVector(sxprfac)
-    
-    # run the models
-    #models = ['hypsxrat ~ Pnheter',
-    #          'hypsxrat ~ gender',
-    #          'hypsxrat ~ Pnheter2 + Pnheter',
-    #          'hypsxrat ~ Pnheter2 + Pnheter + gender',
-    #          'Pnheter ~ gender',
-    #          'hypsxrat ~ sxdeny',
-    #          'hypsxrat ~ sxdeny + Pnheter',
-    #          'hypsxrat ~ sxdeny + Pnheter + gender',
-    #          'hypsxrat ~ comsxfac + sxprfac + sxdeny + gender + Pnheter']
-
-
-    #model = models[model_number]
-    #print model
-    #std_dev =  math.sqrt(thinkstats2.Var(hypsxrat, ddof = 1))
-    #print std_dev    
-    #res = RunModel(model)
-    #print (std_dev - ResStdError(res))/std_dev
-    
-    #RunModel(makeModel(taxo, 'HypSxRat', 'Pnheter', 'sxdeny'))
     
 if __name__ == '__main__':
     import sys

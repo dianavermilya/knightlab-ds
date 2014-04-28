@@ -6,7 +6,7 @@ import thinkstats2
 import codecs
 import datetime
 import warnings
-from scales import *
+from scales import scales
 
 #scales = ["JuvDelFc", "JuvDrgFc", "JuvaslFc", "dralcadu", "hoswom", "ComsxFac", "SxPrFAC", "HypSxRat", "ExAggbeh", "ExAggFan", "negmas", "JuvaslFc", "Fetish", "sxdeny", "Pnviojv", "Pnvioad", "Pnchldad", "Pnchldjv", "conchr", "Rconchr", "lkprtkg", "attadhd", "Inhadhd", "sxperanx", "Voyeur", "Exhibit", "Scatol", "Fetish", "ParaRat", "Sadbehr", "sadfanr", "Sadtot", "PCD", "PAcnang", "anxwom", "PAFght", "PAAgFan", "Pnheter", "Pnvio", "Pnearex", "Pnhomo", "impul", "Masadeq", "erecdys", "lkemp"]
 
@@ -164,6 +164,13 @@ def restrict(d, gender):
         new_d[key] = [d[key][i] for i in indexes_to_keep]
     
     return new_d
+
+
+# make the taxo we really care about
+full_taxo = dataToDict("taxo.csv")
+taxo = {scale:full_taxo[scale] for scale in scales}
+taxo_m = restrict(taxo,'male')
+taxo_f = restrict(taxo,'female')
 
 if __name__ == '__main__':
     l1 = [1,2,3,None]
