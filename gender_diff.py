@@ -93,7 +93,6 @@ def PMFDiff(scale1, scale2):
     thinkplot.Pmf(pmf)
     thinkplot.show()
     
-
 def allDiffs():
     hyp_sex_factors = ["HypSxRat", "ComsxFac", "SxPrFAC"]
     threshold = 0.05
@@ -121,6 +120,9 @@ if __name__ == "__main__":
     # print genderCorrs("HypSxRat", "SxPrFAC"), statSig("HypSxRat", "SxPrFAC")
     # print genderCorrs("HypSxRat", "PCD"), statSig("HypSxRat", "PCD")
     # print genderCorrs("HypSxRat", "Fetish"), statSig("HypSxRat", "Fetish")
-    allDiffs()
+    #allDiffs()
+    
+    PMFDiff("HypSxRat", "lkemp")
+    
     
     
