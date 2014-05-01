@@ -142,19 +142,20 @@ def JavaGraph(d):
     
     comps = [MomentAnalysis, WeightedCorr, thinkstats2.Corr]
     
-    matrix = []
-    for scale in scales:
-        matrix.append([KeyCompare(d, scale, other) for other in scales])
+    for comp in comps:
+        matrix = []
+        for scale in scales:
+            matrix.append([KeyCompare(d, scale, other, comp) for other in scales])
+        
+        fp = open("javagraph_{}.txt".format(str(comp).split(' ')[1]), "w")
+        fp.write(str(scales)+'\n')
+        fp.write(str(matrix))
+        
+        #for row in rows:
+        #    fp.write(str(row)+'\n')
+        
+        fp.close()
     
-    fp = open("javagraph.txt", "w")
-    fp.write(str(scales)+'\n')
-    fp.write(str(matrix))
-    
-    #for row in rows:
-    #    fp.write(str(row)+'\n')
-    
-    fp.close()
-
 if __name__ == '__main__':
     beths = dataToDict('beths.csv')
     taxo = dataToDict('taxo.csv')
