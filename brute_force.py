@@ -62,16 +62,23 @@ def MomentAnalysis(l1, l2):
     # except for some reason, using l1 seems to work better
     return  max(Moment(l1,l2),Moment(l2,l1))  #- Moment(l2,l1),  Moment(l2,l1) - Moment(l1,l2))
 
-def WeightedCorr(l1,l2):
+def SpearmanCorrWeighted(l1,l2):
     """
     simply weights the corrolation by the sqrt of the number of data points
     """
     
     return thinkstats2.SpearmanCorr(l1,l2)*math.sqrt(len(l1))
 
+def CorrWeighted(l1,l2):
+    """
+    wieght corrolation by sqrt of population
+    """
+    
+    return thinkstats2.Corr(l1,l2)*math.sqrt(len(l1))
+
 def CombinedMetrics(l1,l2):
     
-    return (3*MomentAnalysis(l1,l2) + 2*WeightedCorr(l1,l2))/5
+    return (3*MomentAnalysis(l1,l2) + 2*SpearmanCorrWeighted(l1,l2))/5
 
 
 def Moment(l1, l2):
@@ -140,14 +147,14 @@ def JavaGraph(d):
     scales = [key for key in d]
     scales.sort()
     
-    comps = [MomentAnalysis, WeightedCorr, thinkstats2.Corr]
+    comps = [MomentAnalysis, SpearmanCorrWeighted, thinkstats2.Corr, thinkstats2.SpearmanCorr, CorrWeighted]
     
     for comp in comps:
         matrix = []
         for scale in scales:
             matrix.append([KeyCompare(d, scale, other, comp) for other in scales])
         
-        fp = open("javagraph_{}.txt".format(str(comp).split(' ')[1]), "w")
+        fp = open("javagraphs/javagraph_{}.txt".format(str(comp).split(' ')[1]), "w")
         fp.write(str(scales)+'\n')
         fp.write(str(matrix))
         
@@ -161,7 +168,7 @@ if __name__ == '__main__':
     taxo = dataToDict('taxo.csv')
     
     #Scatter (taxo, 'ParaRat', 'Sadtot')
-    reduced_taxo = {scale:taxo[scale] for scale in scales}
+    reduced_taxo = {scale:taxo[scale] for scale in scales if scale != "raceR"}
     all_corrs = AllPairs(reduced_taxo, MomentAnalysis)
     all_corrs.sort(reverse=True)
     #print all_corrs[:19]

@@ -83,7 +83,7 @@ def PMFDiff(scale1, scale2):
     """
     
     # more the merrier (and slower)
-    n = 10000
+    n = 50000
     
     # create the diff
     diff = randomDiffs(scale1, scale2, n)

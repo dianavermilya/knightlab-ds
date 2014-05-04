@@ -8,8 +8,6 @@ import datetime
 import warnings
 from scales import scales
 
-#scales = ["JuvDelFc", "JuvDrgFc", "JuvaslFc", "dralcadu", "hoswom", "ComsxFac", "SxPrFAC", "HypSxRat", "ExAggbeh", "ExAggFan", "negmas", "JuvaslFc", "Fetish", "sxdeny", "Pnviojv", "Pnvioad", "Pnchldad", "Pnchldjv", "conchr", "Rconchr", "lkprtkg", "attadhd", "Inhadhd", "sxperanx", "Voyeur", "Exhibit", "Scatol", "Fetish", "ParaRat", "Sadbehr", "sadfanr", "Sadtot", "PCD", "PAcnang", "anxwom", "PAFght", "PAAgFan", "Pnheter", "Pnvio", "Pnearex", "Pnhomo", "impul", "Masadeq", "erecdys", "lkemp"]
-
 def reviseDataType (string):
     """
     Atttempts to turn the string into the appropriate data type

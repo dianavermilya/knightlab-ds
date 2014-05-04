@@ -49,3 +49,5 @@ scales = ['JuvDelFc',
 # 'drug_use_teen',
 'genderversion',
 'raceR']
+
+porn_scales = ["Pnheter", "Pnhomo", "Pnearex", "Pnchldjv", "Pnchldad", "Pnvio", "Pnviojv", "Pnvioad"]

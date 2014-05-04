@@ -4,7 +4,7 @@ from filter_data import dataToDict, remove_none, restrict, taxo, taxo_m, taxo_f
 import matplotlib.pyplot as plt
 import rpy2.robjects as robjects
 import itertools
-from scales import *
+from scales import scales, porn_scales
 r = robjects.r
 
 #import agemodel
@@ -124,6 +124,55 @@ def ResStdError(res):
     return rse
 
 
+def indepVars(res):
+    """
+    extracts the explanitory variables from the model
+    """
+    lines = str(r.summary(res))
+    
+    variables = []
+    for line in lines.split('\n'):
+        
+        # extract the residual standard error
+        variable = line.split(' ')[0]
+        if variable in taxo:
+            variables.append(variable)
+    return variables
+    
+def modelPower(d, res, variable):
+    """
+    return the amount by which the standerd deviation has decreased using this model
+    
+    res: result from running the model
+    variable: thing the model was measuring
+    """
+    
+    # extract the residual standard error from the report
+    std_er = ResStdError(res)
+    var = [datum for datum in d[variable] if not(datum is None)]
+    
+    # calculate the initial standard deviation of the dependant variable before
+    # removing the data necessary (one or more was none there)
+    initial_std_dev =  math.sqrt(thinkstats2.Var(var, ddof = 1))
+    
+    variables = [d[indepVar] for indepVar in indepVars(res)]
+    variables.append(d[variable])
+    var_remove_none = remove_none(variables)[-1]
+    
+    # standard deviation of the variable going into the model
+    std_dev =  math.sqrt(thinkstats2.Var(var_remove_none, ddof = 1))
+    
+    var = std_dev**2
+    # report improvement
+    if std_dev == 0:
+        # print "\n ;( ;("+variable+"\n"
+        return 0
+    
+    indepVars(res)
+    return (std_dev - ResStdError(res))/std_dev
+    
+    # return math.sqrt((var - ResStdError(res)**2)/var)
+
 def makeModel(d, *scales):
     """
     given a a series of variables, try to model the first based on the rest.
@@ -195,7 +244,7 @@ def allModels(d, *scales):
     model_results = []
     for combo in explanitory_combinations:
         model = makeModel(data, scales[0], *combo)
-        power = modelPower(RunModel(model, print_flag=False), data[scales[0]])
+        power = modelPower(d, RunModel(model, print_flag=False), scales[0])
         model_results.append((ResStdError(RunModel(model, print_flag=False)), power, model))
     
     model_results.sort()
@@ -218,6 +267,7 @@ def bestExplained(d, dependant_varialbes, explanitory_variables):
     
     expl_powers = []
     for dependant in dependant_varialbes:
+        print dependant
         # find how well it is modeled
         expl_power = allModels(d, dependant, *explanitory_variables)[0][1]
         expl_powers.append((expl_power, dependant))
@@ -225,113 +275,35 @@ def bestExplained(d, dependant_varialbes, explanitory_variables):
     expl_powers.sort(reverse = True)
     return expl_powers
 
-def modelPower(res, variable):
-    """
-    return the amount by which the standerd deviation has decreased using this model
-    
-    res: result from running the model
-    variable: thing the model was measuring
-    """
-    
-    # extract the residual standard error from the report
-    std_er = ResStdError(res)
-    var = [datum for datum in variable if not(datum is None)]
-    
-    # calculate the initial standard deviation
-    std_dev =  math.sqrt(thinkstats2.Var(var, ddof = 1))
-    var = std_dev**2
-    
-    # report improvement
-    if std_dev == 0:
-        # print "\n ;( ;("+variable+"\n"
-        return 0
-    return (std_dev - ResStdError(res))/std_dev
-    
-    # return math.sqrt((var - ResStdError(res)**2)/var)
-
 def main(script, model_number=0):
-    
-    #taxo = dataToDict("taxo.csv")
-    #reduced_taxo = {scale:taxo[scale] for scale in scales}
-    #taxo_m = restrict(reduced_taxo,'male')
-    #taxo_f = restrict(reduced_taxo,'female')
-    
-    # models = allModels(taxo_m, "HypSxRat", "Pnheter", "Sadtot", "sxdeny", "ParaRat", "Voyeur", "SxPrFAC", "ComsxFac", "Fetish", "PCD")
-
+    model = makeModel(taxo_f, "JuvDelFc", 'Pnchldad')
+    res = RunModel(model)
+    print modelPower(taxo_f, res, "JuvDelFc")
+    #print models[:10]
     # model_tuple = models[0]
     # print model_tuple
     # print ellementPower(model_tuple, taxo_m)
     
-    # models = allModels(taxo_f, "HypSxRat", "Pnheter", "Sadtot", "sxdeny", "ParaRat", "Voyeur", "SxPrFAC", "ComsxFac", "Fetish", "PCD")
-
     # model_tuple = models[0]
     # print model_tuple
     # print ellementPower(model_tuple, taxo_f)
-    
-    # models = allModels(taxo_m, "HypSxRat", "Pnheter", "Pnhomo", "Pnearex", "Pnchldjv", "Pnchldad", "Pnvio")
-
-    # model_tuple = models[0]
-    # print model_tuple
-    # print ellementPower(model_tuple, taxo_m)
-    
-    # models = allModels(taxo_f, "HypSxRat", "Pnheter", "Pnhomo", "Pnearex", "Pnchldjv", "Pnchldad", "Pnvio")
-
-    # model_tuple = models[0]
-    # print model_tuple
-    # print ellementPower(model_tuple, taxo_f)
-    
-    models = allModels(taxo_m, "Sadtot", "Pnheter", "Pnhomo", "Pnearex", "Pnchldjv", "Pnchldad", "Pnvio")
-
-    model_tuple = models[0]
-    print model_tuple
-    print ellementPower(model_tuple, taxo_m)
-    
-    models = allModels(taxo_f, "Sadtot", "Pnheter", "Pnhomo", "Pnearex", "Pnchldjv", "Pnchldad", "Pnvio")
-
-    model_tuple = models[0]
-    print model_tuple
-    print ellementPower(model_tuple, taxo_f)
-    
-    models = allModels(taxo_m, "negmas", "Pnheter", "Pnhomo", "Pnearex", "Pnchldjv", "Pnchldad", "Pnvio")
-
-    model_tuple = models[0]
-    print model_tuple
-    print ellementPower(model_tuple, taxo_m)
-    
-    models = allModels(taxo_f, "negmas", "Pnheter", "Pnhomo", "Pnearex", "Pnchldjv", "Pnchldad", "Pnvio")
-
-    model_tuple = models[0]
-    print model_tuple
-    print ellementPower(model_tuple, taxo_f)
     #print " === Models === "
     #print allModels(taxo, "ComsxFac", "genderversion", "Pnheter", "sxdeny")[:2]
     #print allModels(taxo, "SxPrFAC", "genderversion", "Pnheter", "sxdeny")[:2]
     #print allModels(taxo, "HypSxRat", "genderversion", 'ComsxFac', 'Voyeur', 'ParaRat', 'sxdeny', 'SxPrFAC')[:2]
     #print allModels(taxo, "sxdeny", "genderversion", "Pnheter")[:2]
     #print "\n ======== Gender Specific ========\n"
-    #print allModels(taxo_f, "HypSxRat", "Pnheter", "drug_use_teen", "sxdeny")[:2]
+    models = allModels(taxo_f, "JuvDelFc", *porn_scales)
+    print ellementPower(models[0])
+    
+    models = allModels(taxo_f, "JuvDrgFc", *porn_scales)
+    print ellementPower(models[0])
+    model = makeModel(taxo_f, "JuvDrgFc", 'Pnheter', 'Pnchldad', 'Pnvio', 'Pnviojv')
+    res = RunModel(model)
+    print modelPower(taxo_f, res, "JuvDrgFc")
     #print allModels(taxo_f, "HypSxRat", "Pnheter", "JuvDrgFc", "sxdeny")[:2]
     #print allModels(taxo_f, "HypSxRat", "Pnheter", "drug_use_teen", "Pnhomo")[:2]
-    from brute_force import Scatter
-    # Scatter(taxo_f, "HypSxRat", "Pnheter")
-    # Scatter(taxo_m, "HypSxRat", "Pnheter")
-    # Scatter(taxo_f, "Sadtot", "Pnheter")
-    # Scatter(taxo_m, "Sadtot", "Pnheter")
-    # Scatter(taxo_f, "negmas", "Pnchldjv")
-    # Scatter(taxo_m, "negmas", "Pnchldjv")
-    # Scatter(taxo_f, "negmas", "Pnearex")
-    # Scatter(taxo_m, "negmas", "Pnearex")
-    #Scatter(taxo_f, "HypSxRat", "Pnearex")
-    #Scatter(taxo_m, "HypSxRat", "Pnearex")
-    #Scatter(taxo_f, "HypSxRat", "JuvDrgFc")
-    #Scatter(taxo_m, "HypSxRat", "JuvDrgFc")
-    #Scatter(reduced_taxo, "HypSxRat", "sxdeny")
     
-    porn_scales = ["Pnheter", "Pnhomo", "Pnearex", "Pnchldjv", "Pnchldad", "Pnvio", "Pnviojv", "Pnvioad"]
-    other_scales = [scale for scale in scales if not(scale in porn_scales)]
-    
-    print bestExplained(taxo_f, other_scales, porn_scales)
-    print bestExplained(taxo_m, other_scales, porn_scales)
     
 if __name__ == '__main__':
     import sys
