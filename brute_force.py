@@ -3,7 +3,7 @@ import thinkplot
 import thinkstats2
 import numpy
 from scales import *
-from filter_data import dataToDict, remove_none
+from filter_data import remove_none, taxo, taxo_f, taxo_m
 
 def ChooseTwo(l):
     """
@@ -138,7 +138,7 @@ def Scatter(d, var1, var2, **kwargs):
     thinkplot.Scatter(data[0], data[1], **kwargs)
     thinkplot.show()
 
-def JavaGraph(d):
+def JavaGraph(d,name):
     """
     create the matrix used by the javascript visualizer
     """
@@ -154,7 +154,7 @@ def JavaGraph(d):
         for scale in scales:
             matrix.append([KeyCompare(d, scale, other, comp) for other in scales])
         
-        fp = open("javagraphs/javagraph_{}.txt".format(str(comp).split(' ')[1]), "w")
+        fp = open("javagraphs/javagraph_{}_{}.txt".format(str(comp).split(' ')[1], name), "w")
         fp.write(str(scales)+'\n')
         fp.write(str(matrix))
         
@@ -164,12 +164,8 @@ def JavaGraph(d):
         fp.close()
     
 if __name__ == '__main__':
-    beths = dataToDict('beths.csv')
-    taxo = dataToDict('taxo.csv')
-    
-    #Scatter (taxo, 'ParaRat', 'Sadtot')
-    reduced_taxo = {scale:taxo[scale] for scale in scales if scale != "raceR"}
-    all_corrs = AllPairs(reduced_taxo, MomentAnalysis)
+
+    all_corrs = AllPairs(taxo, MomentAnalysis)
     all_corrs.sort(reverse=True)
     #print all_corrs[:19]
     #for c in all_corrs[:29]:
@@ -177,5 +173,6 @@ if __name__ == '__main__':
     
     print "\n ======== \n"
     
-    print JavaGraph(reduced_taxo)
-    
+    JavaGraph(taxo, "all")
+    JavaGraph(taxo_f, "female")
+    JavaGraph(taxo_m, "male")
