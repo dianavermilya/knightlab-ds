@@ -51,6 +51,7 @@ def MostRelated(d, variable, metric = thinkstats2.Corr):
     
     #numeric_keys = [key for key in d["__numeric__"] if key in d["__relevant__"]]
     matches = [(abs(KeyCompare(d, variable, other, comp = metric)), other) for other in d if other != variable]
+    matches.sort(reverse = True)
     return matches
     
 def MomentAnalysis(l1, l2):

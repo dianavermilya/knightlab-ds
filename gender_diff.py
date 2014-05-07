@@ -18,14 +18,13 @@ def genderCorrs(scale1, scale2):
     return abs(corr_m) - abs(corr_f), scale1, scale2
 
 
-def statSig(scale1, scale2):
+def statSig(scale1, scale2, n = 1000):
     """
     Compute statisitcal significance of the gender differences for the two sales
     """
     
     actual_diff = genderCorrs(scale1, scale2)[0]
     
-    n = 5000
     rand_diffs = randomDiffs(scale1, scale2, n)
     
     # compute how many are greater that the actual_diff
@@ -83,7 +82,7 @@ def PMFDiff(scale1, scale2):
     """
     
     # more the merrier (and slower)
-    n = 50000
+    n = 1000
     
     # create the diff
     diff = randomDiffs(scale1, scale2, n)

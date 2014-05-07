@@ -197,7 +197,7 @@ def ellementPower(model_tuple, d = None):
     Returns the explanitory power of each variable used in the model
     """
     
-    initial_std_er = model_tuple[0]
+    initial_std_er = model_tuple[1]
     model = model_tuple[-1]
     
     # first step is to extract the explanitory variables
@@ -207,7 +207,7 @@ def ellementPower(model_tuple, d = None):
     
     # if we only had one explanatory variable, don't bother
     if len(variables) <= 1:
-        return (model_tuple[1], variables[0])
+        return (model_tuple[0], variables[0])
 
     # now create a model without each 
     models = []
@@ -225,7 +225,7 @@ def ellementPower(model_tuple, d = None):
 
 def allModels(d, *scales):
     """
-    Create all possible models given the scales (with squaring)
+    Create all possible models given the scales
     """
     
     # first, create a smaller dictionary, just of the data we are using
@@ -245,9 +245,9 @@ def allModels(d, *scales):
     for combo in explanitory_combinations:
         model = makeModel(data, scales[0], *combo)
         power = modelPower(d, RunModel(model, print_flag=False), scales[0])
-        model_results.append((ResStdError(RunModel(model, print_flag=False)), power, model))
+        model_results.append((power, ResStdError(RunModel(model, print_flag=False)), model))
     
-    model_results.sort()
+    model_results.sort(reverse=True)
     return model_results
 
 def allSubsets(iterable):
@@ -269,7 +269,7 @@ def bestExplained(d, dependant_varialbes, explanitory_variables):
     for dependant in dependant_varialbes:
         print dependant
         # find how well it is modeled
-        expl_power = allModels(d, dependant, *explanitory_variables)[0][1]
+        expl_power = allModels(d, dependant, *explanitory_variables)[0][0]
         expl_powers.append((expl_power, dependant))
 
     expl_powers.sort(reverse = True)

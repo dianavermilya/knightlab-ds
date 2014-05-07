@@ -3,13 +3,12 @@ from filter_data import taxo, taxo_f, taxo_m
 from regressions import bestExplained
 
 other_scales = [scale for scale in scales if not(scale in porn_scales) and not(scale == "genderversion")]
-    
-assert not("Pnviojv" in other_scales)
-    
+
+
 fp = open("porn_modeling.txt", 'w')
 fp.write("This document shows how well pornography habits predict other psycological scales\n\n")
 fp.write("Total population:\n")
-fp.write(str(bestExplained(taxo, other_scales, porn_scales)))
+fp.write(str(bestExplained(taxo, other_scales+["genderversion"], porn_scales)))
 fp.write("\n===========\n")
 print ("\n===========\n")
 fp.write("For women:\n")

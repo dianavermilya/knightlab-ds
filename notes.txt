@@ -1,9 +1,11 @@
 50 scales. (not using genderversion)
-3 hyper sex scales (ComsxFac, HypSxRat, SxPrFAC)
+3 sexualization scales (ComsxFac, HypSxRat, SxPrFAC)
 147 corrolation differences
 
 Expect if random: ~ 7 of these to be different with p < 0.05
 Actually: 52 differences with p < 0.05
 		  (4 with p > 0.95, so probably result of randomness)
 
-Looking specifically at hypersexuality.  All pornography scales that show a significant corrolation difference for men and women are more strongly corrolated for women (Pnhomo, Pnheter, Pnearex).  Other pornography scales showed no statistically significant corrolation difference.  Also, all the scales that were found to be usefull when modeling hypersexuality and showed statistically significant gender corrolation difference (ComsxFac, SxPrFAC, Pnheter, sxdeny, Exhibit) were more strongly corrolated for women than for men.
+Looking specifically at hypersexuality.  All pornography scales that show a significant corrolation difference for men and women are more strongly corrolated for women (Pnhomo, Pnheter, Pnearex).  Other pornography scales showed no statistically significant corrolation difference.  Also, all the scales that were strongly corrolated to hypersexuality and showed statistically significant gender corrolation difference (ComsxFac, SxPrFAC, Pnheter, sxdeny, Exhibit) were more strongly corrolated for women than for men. Likewise for the two other sexualization factors.  The difference in corrolation with their top corrolates favours women, except for Sexual preocupation factor with impulsivity and Pervasive Anger Constant Anger Factor Scale (2 out of 11 corrolations).  This bias towards female corrolation breaks down, however, when the range is broadened to include scales less well corrolated with the sexualization scales.
+
+Using pornography scales to model other psychological scales, we expect pornography to corrolate well with the sexualization scales.  This is generally observed in the general population.  Pornography can model sexual preocupation, denial of sexual behavior and hypersexuality fairly well (20%, 20%, and 16% respectively, which is 1st, 2nd and 4th, Expressive Aggression Behavior is 3rd with 17%).  Sexual compulsivity, however, is not so well modeled by pornography. The situation changes drastically when we split the population based on gender. For men, pornography still models hypersexuality and denial of sexual behavior the best of any of the factors, but only accounts for 15% of the deviation of each of these.
