@@ -132,12 +132,34 @@ def indepVars(res):
     
     variables = []
     for line in lines.split('\n'):
-        
-        # extract the residual standard error
         variable = line.split(' ')[0]
         if variable in taxo:
             variables.append(variable)
     return variables
+
+def isFloat(string):
+    try:
+        float(string)
+        return True
+    except:
+        return False
+
+def sigVars(res):
+    """
+    return the statistically significant variables of a model and their coefficients
+    """
+    
+    lines = str(r.summary(res))
+    scales = []
+    for line in lines.split('\n'):
+        scale = line.split(' ')[0]
+        
+        if scale in taxo and line.strip()[-1] == '*':
+            coeff = filter(lambda x: isFloat(x), line.split(' '))[0]
+            scales.append((scale, coeff))
+    
+    return scales
+
     
 def modelPower(d, res, variable):
     """
@@ -168,7 +190,7 @@ def modelPower(d, res, variable):
         # print "\n ;( ;("+variable+"\n"
         return 0
     
-    indepVars(res)
+    #indepVars(res)
     return (std_dev - ResStdError(res))/std_dev
     
     # return math.sqrt((var - ResStdError(res)**2)/var)
@@ -192,12 +214,12 @@ def makeModel(d, *scales):
     model = '{} ~ {}'.format(scales[0], ' + '.join(scales[1:]))
     return model
 
-def ellementPower(model_tuple, d = None):
+def ellementPower(model_tuple, d):
     """
     Returns the explanitory power of each variable used in the model
     """
     
-    initial_std_er = model_tuple[1]
+    initial_power = model_tuple[0]
     model = model_tuple[-1]
     
     # first step is to extract the explanitory variables
@@ -207,7 +229,7 @@ def ellementPower(model_tuple, d = None):
     
     # if we only had one explanatory variable, don't bother
     if len(variables) <= 1:
-        return (model_tuple[0], variables[0])
+        return [(model_tuple[0], variables[0])]
 
     # now create a model without each 
     models = []
@@ -219,8 +241,8 @@ def ellementPower(model_tuple, d = None):
             model = makeModel(d, *([dependant] + [var for var in variables if not(var == var_to_inspect)]))
 
         # compute how much the error increased by removing that variable
-        error_increase = ResStdError(RunModel(model, print_flag = False)) - initial_std_er
-        error_deltas.append((error_increase, var_to_inspect))
+        power_decrease = initial_power - modelPower(d, RunModel(model, print_flag = False), dependant)
+        error_deltas.append((power_decrease, var_to_inspect))
     return error_deltas
 
 def allModels(d, *scales):
@@ -244,11 +266,35 @@ def allModels(d, *scales):
     model_results = []
     for combo in explanitory_combinations:
         model = makeModel(data, scales[0], *combo)
-        power = modelPower(d, RunModel(model, print_flag=False), scales[0])
-        model_results.append((power, ResStdError(RunModel(model, print_flag=False)), model))
+        res = RunModel(model, print_flag=False)
+        power = modelPower(d, res, scales[0])
+        model_results.append((power, res, model))
     
     model_results.sort(reverse=True)
     return model_results
+
+
+def bestModel(d, *scales):
+    """
+    create the best model for the variable
+    """
+    
+    # first find the model that provides the best power
+    model_tuple = allModels(d, *scales)[0]
+    res = model_tuple[1]
+
+    # use only the statistically significant variables
+    sig_vars = [tup[0] for tup in sigVars(res)]
+    
+    # make the model    
+    new_model = makeModel(d, scales[0], *sig_vars)
+    
+    # run it
+    res = RunModel(new_model)
+    
+    # return the model as well as the power
+    return modelPower(d, res, scales[0]), new_model
+
 
 def allSubsets(iterable):
     """
@@ -269,8 +315,19 @@ def bestExplained(d, dependant_varialbes, explanitory_variables):
     for dependant in dependant_varialbes:
         print dependant
         # find how well it is modeled
-        expl_power = allModels(d, dependant, *explanitory_variables)[0][0]
-        expl_powers.append((expl_power, dependant))
+        model_tup = allModels(d, dependant, *explanitory_variables)[0]
+        model_string = model_tup[2]
+        
+        # extract important variables
+        [dependant, variables] = model_string.split('~')
+        dependant = dependant.strip()
+        variables = [var.strip() for var in variables.split('+')]
+        model = makeModel(d, dependant, *variables)
+        res = RunModel(model,print_flag=False)
+        sig_vars = sigVars(res)
+        
+        expl_power = model_tup[0]
+        expl_powers.append((expl_power, dependant, sig_vars))
 
     expl_powers.sort(reverse = True)
     return expl_powers
@@ -279,30 +336,7 @@ def main(script, model_number=0):
     model = makeModel(taxo_f, "JuvDelFc", 'Pnchldad')
     res = RunModel(model)
     print modelPower(taxo_f, res, "JuvDelFc")
-    #print models[:10]
-    # model_tuple = models[0]
-    # print model_tuple
-    # print ellementPower(model_tuple, taxo_m)
-    
-    # model_tuple = models[0]
-    # print model_tuple
-    # print ellementPower(model_tuple, taxo_f)
-    #print " === Models === "
-    #print allModels(taxo, "ComsxFac", "genderversion", "Pnheter", "sxdeny")[:2]
-    #print allModels(taxo, "SxPrFAC", "genderversion", "Pnheter", "sxdeny")[:2]
-    #print allModels(taxo, "HypSxRat", "genderversion", 'ComsxFac', 'Voyeur', 'ParaRat', 'sxdeny', 'SxPrFAC')[:2]
-    #print allModels(taxo, "sxdeny", "genderversion", "Pnheter")[:2]
-    #print "\n ======== Gender Specific ========\n"
-    models = allModels(taxo_f, "JuvDelFc", *porn_scales)
-    print ellementPower(models[0])
-    
-    models = allModels(taxo_f, "JuvDrgFc", *porn_scales)
-    print ellementPower(models[0])
-    model = makeModel(taxo_f, "JuvDrgFc", 'Pnheter', 'Pnchldad', 'Pnvio', 'Pnviojv')
-    res = RunModel(model)
-    print modelPower(taxo_f, res, "JuvDrgFc")
-    #print allModels(taxo_f, "HypSxRat", "Pnheter", "JuvDrgFc", "sxdeny")[:2]
-    #print allModels(taxo_f, "HypSxRat", "Pnheter", "drug_use_teen", "Pnhomo")[:2]
+
     
     
 if __name__ == '__main__':
