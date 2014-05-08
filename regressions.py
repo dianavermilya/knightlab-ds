@@ -286,6 +286,10 @@ def bestModel(d, *scales):
     # use only the statistically significant variables
     sig_vars = [tup[0] for tup in sigVars(res)]
     
+    # if no significant variables
+    if len(sig_vars) == 0:
+        return 0, 0, None
+    
     # make the model    
     new_model = makeModel(d, scales[0], *sig_vars)
     
@@ -293,7 +297,7 @@ def bestModel(d, *scales):
     res = RunModel(new_model)
     
     # return the model as well as the power
-    return modelPower(d, res, scales[0]), new_model
+    return modelPower(d, res, scales[0]), ResStdError(res), new_model
 
 
 def allSubsets(iterable):
@@ -315,8 +319,12 @@ def bestExplained(d, dependant_varialbes, explanitory_variables):
     for dependant in dependant_varialbes:
         print dependant
         # find how well it is modeled
-        model_tup = allModels(d, dependant, *explanitory_variables)[0]
+        model_tup = bestModel(d, dependant, *explanitory_variables)
         model_string = model_tup[2]
+        
+        # skip it if there was no good model
+        if model_string is None:
+            continue
         
         # extract important variables
         [dependant, variables] = model_string.split('~')
