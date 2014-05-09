@@ -93,7 +93,7 @@ def PMFDiff(scale1, scale2):
     thinkplot.show()
     
 def allDiffs():
-    hyp_sex_factors = ["HypSxRat", "ComsxFac", "SxPrFAC"]
+    hyp_sex_factors = ["HypSxRat", "ComsxFac", "SxPrFAC", "sxdeny"]
     threshold = 0.05
     
     fp = open("gender_diffs2.txt", 'w')
@@ -119,9 +119,9 @@ if __name__ == "__main__":
     # print genderCorrs("HypSxRat", "SxPrFAC"), statSig("HypSxRat", "SxPrFAC")
     # print genderCorrs("HypSxRat", "PCD"), statSig("HypSxRat", "PCD")
     # print genderCorrs("HypSxRat", "Fetish"), statSig("HypSxRat", "Fetish")
-    #allDiffs()
+    allDiffs()
     
-    PMFDiff("HypSxRat", "lkemp")
+    #PMFDiff("HypSxRat", "lkemp")
     
     
     
