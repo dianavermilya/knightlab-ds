@@ -1,5 +1,6 @@
 knightlab-ds
 ============
-This is a private project.
+Visualization of MIDSA survey data provided by the Brandeis Knightlab.  This data is confidential and not included in the repository.
 
-License: Please do not use this code.
+Licence: MIT 
+
